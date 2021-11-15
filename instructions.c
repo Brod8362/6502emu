@@ -104,16 +104,12 @@ void i_brk(emustate* emu) {
 // JMP instruction
 // LDA instruction
 
-void g_lda(emustate* emu, uint8_t opr) {
-    emu->a = opr;
-}
-
 void i_lda_indr_x(emustate* emu, indr_t opr) {
 
 }
 
 void i_lda_imd(emustate* emu, imd_t opr) {
-    g_lda(emu, opr);
+    emu->a = opr;
 }
 
 void i_lda_abs(emustate* emu, abs_t opr) {
@@ -133,6 +129,45 @@ void i_lda_abs_x(emustate* emu, abs_t opr) {
 }
 
 // LDX instruction
+
+void i_ldx_imd(emustate* emu, imd_t opr) {
+    emu->x = opr;
+}
+
+void i_ldx_zpg(emustate* emu, zpg_t opr) {
+    emu->x = emu->memory[opr];
+}
+
+void i_ldx_abs(emustate* emu, abs_t opr) {
+    emu->x = emu->memory[opr];
+}
+
+void i_ldx_zpg_t(emustate* emu, zpg_t opr) {
+
+}
+
+void i_ldx_abs_y(emustate* emu, abs_t opr) {
+
+}
+
+// LDY instruction
+
+void i_ldy_imd(emustate* emu, imd_t opr) {
+    emu->y = opr;
+}
+
+void i_ldy_zpg(emustate* emu, zpg_t opr) {
+    emu->y = emu->memory[opr];
+}
+
+void i_ldy_abs(emustate* emu, abs_t opr) {
+    emu->y = emu->memory[opr];
+}
+
+void i_ldy_abs_x(emustate* emu, abs_t opr) {
+    //TODO figure out how this works
+}
+
 // LSR instruction
 // NOP instruction
 // ORA instruction

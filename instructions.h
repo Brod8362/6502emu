@@ -1057,7 +1057,7 @@ LDA - load accumulator
 OPC: $A5
 OPR: zero-page
 */
-void i_ldy_zpg(emustate* emu, zpg_t opr);
+void i_lda_zpg(emustate* emu, zpg_t opr);
 
 /*
 LDX - load X
