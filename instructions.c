@@ -89,22 +89,58 @@ cycles_t i_adc_abs_x(emustate* emu, abs_t opr) {
 
 // AND instruction
 
-cycles_t g_and(emustate* emu, uint8_t opr) {
+void g_and(emustate* emu, uint8_t opr) {
+    CLEAR(emu->sr, FLAG_Z);
+    CLEAR(emu->sr, FLAG_N);
     emu->a &= opr;
 
-    if (emu->a == 0) {
+    if (emu->a == 0)
         SET(emu->sr, FLAG_Z);
-    } else {
-        CLEAR(emu->sr, FLAG_Z);
-    }
 
-    if (CHECK(emu->a, 7)) {
+    if (CHECK(emu->a, 7)) 
         SET(emu->sr, FLAG_N);
-    } else {
-        CLEAR(emu->sr, FLAG_N);
-    }
-    //TODO return proper cycle count
-    return -1;
+}
+
+cycles_t i_and_indr_x(emustate* emu, indr_t opr) {
+    //TODO
+    return 6;
+}
+
+cycles_t i_and_zpg(emustate* emu, zpg_t opr) {
+    g_and(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_and_imd(emustate* emu, imd_t opr) {
+    g_and(emu, opr);
+    return 2;
+}
+
+cycles_t i_and_abs(emustate* emu, abs_t opr) {
+    g_and(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
+cycles_t i_and_indr_y(emustate* emu, indr_t opr) {
+    //TODO
+    return 5; //*
+}
+
+cycles_t i_and_zpg_x(emustate* emu, zpg_t opr) {
+    g_and(emu, emu->memory[0][opr+emu->x]);
+    return 4;
+}
+
+cycles_t i_and_abs_y(emustate* emu, abs_t opr) {
+    int adr = opr+emu->y;
+    g_and(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
+}
+
+cycles_t i_and_abs_x(emustate* emu, abs_t opr) {
+    int adr = opr+emu->x;
+    g_and(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
 }
 
 // ASL instruction

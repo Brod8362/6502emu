@@ -156,6 +156,24 @@ int main() {
     assert(CHECK(emu.sr, FLAG_C)); //C must be set
     assert(CHECK(emu.sr, FLAG_V));  //V must be set
 
+    //test AND instruction
+    reset_proc(&emu);
+    i_lda_imd(&emu, 0b11001111);
+    i_and_imd(&emu, 0b11110111);
+    assert(emu.a == 0b11000111);
+
+    i_lda_imd(&emu, 0b00000000);
+    i_and_imd(&emu, 0b11111111);
+    assert(emu.a == 0b00000000);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 0b10101100);
+    i_and_imd(&emu, 0b11011100);
+    assert(emu.a == 0b10001100);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
     printf("All tests passed.\n");
     return 0;
 }
