@@ -58,7 +58,7 @@ ORA - or with accumulator
 OPC: $01
 OPR: X-indexed, indirect
 */
-void i_ora_indr_x(emustate* emu, indr_t ind);
+void i_ora_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -562,6 +562,7 @@ OPC: $53
 /*
 RESERVED
 OPC: $54
+*/
 
 /*
 EOR - exclusive or
@@ -1161,9 +1162,9 @@ void i_cmp_zpg_x(emustate* emu, zpg_t opr);
 /*
 DEC - decrement
 OPC: $B6
-OPR: zero-page, X-indexed
+OPR: zero-page, Y-indexed
 */
-void i_dec_zpg_x(emustate* emu, zpg_t opr);
+void i_ldx_zpg_y(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
