@@ -103,6 +103,35 @@ void i_brk(emustate* emu) {
 // INY instruction
 // JMP instruction
 // LDA instruction
+
+void g_lda(emustate* emu, uint8_t opr) {
+    emu->a = opr;
+}
+
+void i_lda_indr_x(emustate* emu, indr_t opr) {
+
+}
+
+void i_lda_imd(emustate* emu, imd_t opr) {
+    g_lda(emu, opr);
+}
+
+void i_lda_abs(emustate* emu, abs_t opr) {
+
+}
+
+void i_lda_indr_y(emustate* emu, indr_t opr) {
+
+}
+
+void i_lda_abs_y(emustate* emu, abs_t opr) {
+
+}
+
+void i_lda_abs_x(emustate* emu, abs_t opr) {
+
+}
+
 // LDX instruction
 // LSR instruction
 // NOP instruction
@@ -173,11 +202,112 @@ void g_sbc(emustate* emu, uint8_t opr) {
 // SED instruction
 // SEI instruction
 // STA instruction
+
+void i_sta_indr_x(emustate* emu, indr_t opr) {
+    
+}
+
+void i_sta_zpg(emustate* emu, zpg_t opr) {
+    emu->memory[opr] = emu->a;
+}
+
+void i_sta_abs(emustate* emu, abs_t opr) {
+    emu->memory[opr] = emu->a;
+}
+
+void i_sta_indr_y(emustate* emu, indr_t opr) {
+
+}
+
+void i_sta_zpg_x(emustate* emu, zpg_t opr) {
+    
+}
+
+void i_sta_abs_y(emustate* emu, abs_t opr) {
+
+}
+
+void i_sta_abs_x(emustate* emu, abs_t opr) {
+
+}
+
 // STX instruction
+
+void i_stx_zpg(emustate* emu, zpg_t opr) {
+    emu->memory[opr] = emu->x;
+}
+
+void i_stx_abs(emustate* emu, abs_t opr) {
+    emu->memory[opr] = emu->x;
+}
+
+void i_stx_zpg_y(emustate* emu, zpg_t opr) {
+    //TODO idk lol
+}
+
 // STY instruction
+
+void i_sty_zpg(emustate* emu, zpg_t opr) {
+    emu->memory[opr] = emu->y;
+}
+
+void i_sty_abs(emustate* emu, abs_t opr) {
+    emu->memory[opr] = emu->y;
+}
+
+void i_sty_zpg_x(emustate* emu, zpg_t opr) {
+    //TODO idk lol
+}
+
 // TAX instruction
+
+void g_txx_generic(emustate* emu, const uint8_t* source, uint8_t* dest) {
+    *dest = *source;
+
+    if (CHECK(*dest, 7)) {
+        SET(emu->sr, FLAG_N);
+    } else {
+        CLEAR(emu->sr, FLAG_N);
+    }
+
+    if (*dest == 0) {
+        SET(emu->sr, FLAG_Z);
+    } else {
+        CLEAR(emu->sr, FLAG_Z);
+    }
+}
+
+void i_tax(emustate* emu) {
+    g_txx_generic(emu, &emu->a, &emu->x);
+}
+
 // TAY instruction
+
+void i_tay(emustate* emu) {
+    g_txx_generic(emu, &emu->a, &emu->y);
+}
+
 // TSX instruction
+
+void i_tsx(emustate* emu) {
+    g_txx_generic(emu, &emu->sp, &emu->x);
+}
+
 // TXA instruction
+
+void i_txa(emustate* emu) {
+    g_txx_generic(emu, &emu->x, &emu->a);
+}
+
 // TXS instruction
+
+void i_txs(emustate* emu) {
+    //IMPORTANT: this instruction does not set the carry or zero flags
+    emu->sp = emu->x;
+}
+
 // TYA instruction
+
+void i_tya(emustate* emu) {
+    g_txx_generic(emu, &emu->y, &emu->a);
+}
