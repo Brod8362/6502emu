@@ -1,5 +1,18 @@
 #include "instructions.h"
 
+
+
+/*
+
+*: 
+    add 1 to cycles if page boundary is crossed
+
+**: 
+    add 1 to cycles if branch occurs on same page
+    add 2 to cycles if branch occurs to different page
+
+*/
+
 // ADC instruction
 
 void g_adc(emustate* emu, uint8_t opr) {
@@ -28,7 +41,7 @@ void g_adc(emustate* emu, uint8_t opr) {
 
 // AND instruction
 
-void g_and(emustate* emu, uint8_t opr) {
+cycles_t g_and(emustate* emu, uint8_t opr) {
     emu->a &= opr;
 
     if (emu->a == 0) {
@@ -42,6 +55,8 @@ void g_and(emustate* emu, uint8_t opr) {
     } else {
         CLEAR(emu->sr, FLAG_N);
     }
+    //TODO return proper cycle count
+    return -1;
 }
 
 // ASL instruction
@@ -53,16 +68,26 @@ void g_asl(emustate* emu, uint8_t* opr) {
     //todo verify this is acutally what it does
 }
 
-void i_asl_zpg(emustate* emu, zpg_t opr) {
-    g_asl(emu, &emu->memory[opr]);    
+cycles_t i_asl_zpg(emustate* emu, zpg_t opr) {
+    g_asl(emu, &emu->memory[opr]);   
+    return 5; 
 }
 
-void i_asl_a(emustate* emu) {
+cycles_t i_asl_a(emustate* emu) {
     g_asl(emu, &emu->a);
+    return 2;
 }
 
-void i_asl_abs(emustate* emu, abs_t opr) {
+cycles_t i_asl_abs(emustate* emu, abs_t opr) {
+    return 6;
+}
 
+cycles_t i_asl_zpg_x(emustate* emu, indr_t opr) {
+    return 6;
+}
+
+cycles_t i_asl_abs_x(emustate* emu, abs_t opr) {
+    return 7;
 }
 
 // BCC instruction
@@ -73,17 +98,18 @@ void i_asl_abs(emustate* emu, abs_t opr) {
 // BNE instruction
 // BPL instruction
 
-void i_bpl_rel(emustate* emu, rel_t opr) {
-
+cycles_t i_bpl_rel(emustate* emu, rel_t opr) {
+    return 2; //**
 }
 
 // BRK instruction
 
-void i_brk(emustate* emu) {
+cycles_t i_brk(emustate* emu) {
     SET(emu->sr, FLAG_I);
     emu->memory[0x100 + emu->sp++] = emu->pc+2;
     //TODO finish this, do more research on what it really does
     //stores PC+2 into SP?
+    return 7;
 }
 
 // BVC instruction
@@ -104,68 +130,81 @@ void i_brk(emustate* emu) {
 // JMP instruction
 // LDA instruction
 
-void i_lda_indr_x(emustate* emu, indr_t opr) {
-
+cycles_t i_lda_indr_x(emustate* emu, indr_t opr) {
+    return 6;
 }
 
-void i_lda_imd(emustate* emu, imd_t opr) {
+cycles_t i_lda_imd(emustate* emu, imd_t opr) {
     emu->a = opr;
+    return 2;
 }
 
-void i_lda_abs(emustate* emu, abs_t opr) {
-
+cycles_t i_lda_abs(emustate* emu, abs_t opr) {
+    return 4;
 }
 
-void i_lda_indr_y(emustate* emu, indr_t opr) {
-
+cycles_t i_lda_indr_y(emustate* emu, indr_t opr) {
+    return 5; //*
 }
 
-void i_lda_abs_y(emustate* emu, abs_t opr) {
-
+cycles_t i_lda_abs_y(emustate* emu, abs_t opr) {
+    return 4; //*
 }
 
-void i_lda_abs_x(emustate* emu, abs_t opr) {
-
+cycles_t i_lda_abs_x(emustate* emu, abs_t opr) {
+    return 4; //*
 }
 
 // LDX instruction
 
-void i_ldx_imd(emustate* emu, imd_t opr) {
+cycles_t i_ldx_imd(emustate* emu, imd_t opr) {
     emu->x = opr;
+    return 2;
 }
 
-void i_ldx_zpg(emustate* emu, zpg_t opr) {
+cycles_t i_ldx_zpg(emustate* emu, zpg_t opr) {
     emu->x = emu->memory[opr];
+    return 3;
 }
 
-void i_ldx_abs(emustate* emu, abs_t opr) {
+cycles_t i_ldx_abs(emustate* emu, abs_t opr) {
     emu->x = emu->memory[opr];
+    return 4;
 }
 
-void i_ldx_zpg_t(emustate* emu, zpg_t opr) {
-
+cycles_t i_ldx_zpg_y(emustate* emu, zpg_t opr) {
+    return 4;
 }
 
-void i_ldx_abs_y(emustate* emu, abs_t opr) {
-
+cycles_t i_ldx_abs_y(emustate* emu, abs_t opr) {
+    return 4; //*
 }
 
 // LDY instruction
 
-void i_ldy_imd(emustate* emu, imd_t opr) {
+cycles_t i_ldy_imd(emustate* emu, imd_t opr) {
     emu->y = opr;
+    return 2;
 }
 
-void i_ldy_zpg(emustate* emu, zpg_t opr) {
+cycles_t i_ldy_zpg(emustate* emu, zpg_t opr) {
     emu->y = emu->memory[opr];
+    return 3;
 }
 
-void i_ldy_abs(emustate* emu, abs_t opr) {
-    emu->y = emu->memory[opr];
-}
-
-void i_ldy_abs_x(emustate* emu, abs_t opr) {
+cycles_t i_ldy_zpg_x(emustate* emu, zpg_t opr) {
     //TODO figure out how this works
+    return 4;
+}
+
+cycles_t i_ldy_abs(emustate* emu, abs_t opr) {
+    emu->y = emu->memory[opr];
+    return 4;
+}
+
+cycles_t i_ldy_abs_x(emustate* emu, abs_t opr) {
+    //TODO figure out how this works
+    return 4; //*
 }
 
 // LSR instruction
@@ -181,27 +220,31 @@ void g_ora(emustate* emu, uint8_t opr) {
     //TODO figure out when the flags should be set
 }
 
-void i_ora_indr_x(emustate* emu, indr_t opr) {
+cycles_t i_ora_indr_x(emustate* emu, indr_t opr) {
     g_ora(emu, emu->memory[opr+emu->x]);
+    return 4; //*
 }
 
-void i_ora_zpg(emustate* emu, zpg_t opr) {
+cycles_t i_ora_zpg(emustate* emu, zpg_t opr) {
     g_ora(emu, emu->memory[opr]);
+    return 3;
 }
 
-void i_ora_imd(emustate* emu, imd_t opr) {
+cycles_t i_ora_imd(emustate* emu, imd_t opr) {
     g_ora(emu, opr);
+    return 2;
 }
 
-void i_ora_abs(emustate* emu, abs_t opr) {
-
+cycles_t i_ora_abs(emustate* emu, abs_t opr) {
+    return 4;
 }
 
 // PHA instruction
 // PHP insturction
 
-void i_php(emustate* emu) {
+cycles_t i_php(emustate* emu) {
     emu->memory[0x100 + emu->sp++] = emu->sr;
+    return 3;
 }
 
 // PLA instruction
@@ -238,60 +281,68 @@ void g_sbc(emustate* emu, uint8_t opr) {
 // SEI instruction
 // STA instruction
 
-void i_sta_indr_x(emustate* emu, indr_t opr) {
-    
+cycles_t i_sta_indr_x(emustate* emu, indr_t opr) {
+    return 6;
 }
 
-void i_sta_zpg(emustate* emu, zpg_t opr) {
+cycles_t i_sta_zpg(emustate* emu, zpg_t opr) {
     emu->memory[opr] = emu->a;
+    return 3;
 }
 
-void i_sta_abs(emustate* emu, abs_t opr) {
+cycles_t i_sta_abs(emustate* emu, abs_t opr) {
     emu->memory[opr] = emu->a;
+    return 4;
 }
 
-void i_sta_indr_y(emustate* emu, indr_t opr) {
-
+cycles_t i_sta_indr_y(emustate* emu, indr_t opr) {
+    return 6;
 }
 
-void i_sta_zpg_x(emustate* emu, zpg_t opr) {
-    
+cycles_t i_sta_zpg_x(emustate* emu, zpg_t opr) {
+    return 4;
 }
 
-void i_sta_abs_y(emustate* emu, abs_t opr) {
-
+cycles_t i_sta_abs_y(emustate* emu, abs_t opr) {
+    return 5;
 }
 
-void i_sta_abs_x(emustate* emu, abs_t opr) {
-
+cycles_t i_sta_abs_x(emustate* emu, abs_t opr) {
+    return 5;
 }
 
 // STX instruction
 
-void i_stx_zpg(emustate* emu, zpg_t opr) {
+cycles_t i_stx_zpg(emustate* emu, zpg_t opr) {
     emu->memory[opr] = emu->x;
+    return 3;
 }
 
-void i_stx_abs(emustate* emu, abs_t opr) {
+cycles_t i_stx_abs(emustate* emu, abs_t opr) {
     emu->memory[opr] = emu->x;
+    return 4;
 }
 
-void i_stx_zpg_y(emustate* emu, zpg_t opr) {
+cycles_t i_stx_zpg_y(emustate* emu, zpg_t opr) {
     //TODO idk lol
+    return 4;
 }
 
 // STY instruction
 
-void i_sty_zpg(emustate* emu, zpg_t opr) {
+cycles_t i_sty_zpg(emustate* emu, zpg_t opr) {
     emu->memory[opr] = emu->y;
+    return 3;
 }
 
-void i_sty_abs(emustate* emu, abs_t opr) {
+cycles_t i_sty_abs(emustate* emu, abs_t opr) {
     emu->memory[opr] = emu->y;
+    return 4;
 }
 
-void i_sty_zpg_x(emustate* emu, zpg_t opr) {
+cycles_t i_sty_zpg_x(emustate* emu, zpg_t opr) {
     //TODO idk lol
+    return 4;
 }
 
 // TAX instruction
@@ -312,37 +363,43 @@ void g_txx_generic(emustate* emu, const uint8_t* source, uint8_t* dest) {
     }
 }
 
-void i_tax(emustate* emu) {
+cycles_t i_tax(emustate* emu) {
     g_txx_generic(emu, &emu->a, &emu->x);
+    return 2;
 }
 
 // TAY instruction
 
-void i_tay(emustate* emu) {
+cycles_t i_tay(emustate* emu) {
     g_txx_generic(emu, &emu->a, &emu->y);
+    return 2;
 }
 
 // TSX instruction
 
-void i_tsx(emustate* emu) {
+cycles_t i_tsx(emustate* emu) {
     g_txx_generic(emu, &emu->sp, &emu->x);
+    return 2;
 }
 
 // TXA instruction
 
-void i_txa(emustate* emu) {
+cycles_t i_txa(emustate* emu) {
     g_txx_generic(emu, &emu->x, &emu->a);
+    return 2;
 }
 
 // TXS instruction
 
-void i_txs(emustate* emu) {
+cycles_t i_txs(emustate* emu) {
     //IMPORTANT: this instruction does not set the carry or zero flags
     emu->sp = emu->x;
+    return 2;
 }
 
 // TYA instruction
 
-void i_tya(emustate* emu) {
+cycles_t i_tya(emustate* emu) {
     g_txx_generic(emu, &emu->y, &emu->a);
+    return 2;
 }

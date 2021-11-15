@@ -31,4 +31,9 @@ set PC to address stored at this address (its odd)
 */
 typedef uint16_t indr_t;
 
+/*
+number of cycles it takes for an instruction of execute
+*/
+typedef uint16_t cycles_t;
+
 #endif
