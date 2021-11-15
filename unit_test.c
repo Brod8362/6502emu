@@ -50,7 +50,32 @@ int main() {
 
     reset_proc(&emu);
 
-    
+    //TEST CLEAR/SET
+    assert(CHECK(emu.sr, FLAG_C) == 0);
+    assert(CHECK(emu.sr, FLAG_D) == 0);
+    assert(CHECK(emu.sr, FLAG_V) == 0);
+    assert(CHECK(emu.sr, FLAG_I) == 0);
+
+    i_sec(&emu);
+    i_sed(&emu);
+    i_sei(&emu);
+    //TODO perform an operation that sets overflow bit
+    SET(emu.sr, FLAG_V);
+
+    assert(CHECK(emu.sr, FLAG_C) == 1);
+    assert(CHECK(emu.sr, FLAG_D) == 1);
+    assert(CHECK(emu.sr, FLAG_V) == 1);
+    assert(CHECK(emu.sr, FLAG_I) == 1);
+
+    i_clc(&emu);
+    i_cld(&emu);
+    i_clv(&emu);
+    i_cli(&emu);
+
+    assert(CHECK(emu.sr, FLAG_C) == 0);
+    assert(CHECK(emu.sr, FLAG_D) == 0);
+    assert(CHECK(emu.sr, FLAG_V) == 0);
+    assert(CHECK(emu.sr, FLAG_I) == 0);
 
     printf("All tests passed.\n");
     return 0;

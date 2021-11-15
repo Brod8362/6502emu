@@ -36,7 +36,7 @@ void g_adc(emustate* emu, uint8_t opr) {
         CLEAR(emu->sr, FLAG_Z);
     }  
 
-    emu->a = (uint8_t)s;
+    emu->a = s & 0xFF;
 }
 
 // AND instruction
@@ -118,9 +118,33 @@ cycles_t i_brk(emustate* emu) {
 
 // BVC instruction
 // CLC instruction
+
+cycles_t i_clc(emustate* emu) {
+    CLEAR(emu->sr, FLAG_C);
+    return 2;
+}
+
 // CLD instruction
+
+cycles_t i_cld(emustate* emu) {
+    CLEAR(emu->sr, FLAG_D);
+    return 2;
+}
+
 // CLI instruction
+
+cycles_t i_cli(emustate* emu) {
+    CLEAR(emu->sr, FLAG_I);
+    return 2;
+}
+
 // CLV instruction
+
+cycles_t i_clv(emustate* emu) {
+    CLEAR(emu->sr, FLAG_V);
+    return 2;
+}
+
 // CMP instruction
 // CPX instruction
 // CPY instruction
@@ -321,8 +345,26 @@ void g_sbc(emustate* emu, uint8_t opr) {
 }
 
 // SEC instruction
+
+cycles_t i_sec(emustate* emu) {
+    SET(emu->sr, FLAG_C);
+    return 2;
+}
+
 // SED instruction
+
+cycles_t i_sed(emustate* emu) {
+    SET(emu->sr, FLAG_D);
+    return 2;
+}
+
 // SEI instruction
+
+cycles_t i_sei(emustate* emu) {
+    SET(emu->sr, FLAG_I);
+    return 2;
+}
+
 // STA instruction
 
 cycles_t i_sta_indr_x(emustate* emu, indr_t opr) {
