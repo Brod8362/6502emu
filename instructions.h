@@ -178,14 +178,14 @@ ORA - or with accumulator
 OPC: $15
 OPR: zero-page, X-indexed
 */
-cycles_t i_ora_indr_x(emustate* emu, indr_t opr);
+cycles_t i_ora_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 ASL - arithmetic shift left
 OPC: $16
 OPR: zero-page, X-indexed
 */
-cycles_t i_asl_zpg_x(emustate* emu, indr_t opr);
+cycles_t i_asl_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED

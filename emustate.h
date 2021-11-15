@@ -30,7 +30,7 @@ typedef struct emustate {
     uint8_t sp;
     // Program Counter
     uint16_t pc;
-    uint8_t memory[256*256];
+    uint8_t memory[256][256];
 } emustate;
 
 #endif
