@@ -174,6 +174,27 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_Z));
     assert(CHECK(emu.sr, FLAG_N));
 
+    //test OR instruction
+    reset_proc(&emu);
+    i_lda_imd(&emu, 0b00000000);
+    i_ora_imd(&emu, 0b11111111);
+    assert(emu.a == 0b11111111);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 0b10101010);
+    i_ora_imd(&emu, 0b01010101);
+    assert(emu.a == 0b11111111);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 0b00000000);
+    i_ora_imd(&emu, 0b00000000);
+    assert(emu.a == 0b00000000);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+
+
     printf("All tests passed.\n");
     return 0;
 }
