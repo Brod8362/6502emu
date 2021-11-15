@@ -2,6 +2,7 @@
 #define INSTRUCTIONS_H
 
 #include "types.h"
+#include "emustate.h"
 // https://en.wikipedia.org/wiki/WDC_65C02
 // https://www.masswerk.at/6502/6502_instruction_set.html
 // first part is documenting all instructions
@@ -12,7 +13,7 @@
 void i_opc_param1_param2_param3(type p1, type p2, ...);
 
 most opcodes can have multiple different parameters so it's important to differentiate them
-going to use the same convnetion used on the masswerk website linked above
+going to use a similar convnetion used on the masswerk website linked above
 
 A     ... Accumulator         ... OPC A       - operand is AC (implied single byte instruction)
 abs   ... absolute            ... OPC $LLHH   - operand is address $HHLL *
@@ -50,14 +51,14 @@ BRK - break
 OPC: $00
 OPR: implied
 */
-void i_brk();
+void i_brk(emustate* emu);
 
 /*
 ORA - or with accumulator
 OPC: $01
 OPR: X-indexed, indirect
 */
-void i_ora_indr_x(indr_t ind);
+void i_ora_indr_x(emustate* emu, indr_t ind);
 
 /*
 RESERVED
@@ -79,14 +80,14 @@ ORA - or with accumulator
 OPC: $05
 OPR: immediate
 */
-void i_ora_zpg(zpg_t opr);
+void i_ora_zpg(emustate* emu, zpg_t opr);
 
 /*
 ASL - arithmetic shift left
 OPC: $06
 OPR: zero-page
 */
-void i_asl_zpg(zpg_t opr);
+void i_asl_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -98,21 +99,21 @@ PHP - push processor status onto stack
 OPC: $08
 OPR: implied
 */
-void i_php();
+void i_php(emustate* emu);
 
 /*
 ORA - or with accumulator
 OPC: $09
 OPR: immediate
 */
-void i_ora_imd(imd_t opr);
+void i_ora_imd(emustate* emu, imd_t opr);
 
 /*
 ASL - artihmetic shift left
 OPC: $0A
 OPR: accumulator
 */
-void i_asl_a();
+void i_asl_a(emustate* emu);
 
 /*
 RESERVED
@@ -129,14 +130,14 @@ ORA - or with accumulator
 OPC: $0D
 OPR: absolute
 */
-void i_ora_abs(abs_t opr);
+void i_ora_abs(emustate* emu, abs_t opr);
 
 /*
 ASL - arithmetic shift left
 OPC: $0E
 OPR: absolute
 */
-void i_asl_abs(abs_t opr);
+void i_asl_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -148,14 +149,14 @@ BPL - branch on plus
 OPC: $10
 OPR: relative
 */
-void i_bpl_rel(rel_t opr);
+void i_bpl_rel(emustate* emu, rel_t opr);
 
 /*
 ORA - or with accumulator
 OPC: $11
 OPR: indirect, Y-indexed
 */
-void i_ora_indr_y(indr_t opr);
+void i_ora_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -177,14 +178,14 @@ ORA - or with accumulator
 OPC: $15
 OPR: zero-page, X-indexed
 */
-void i_ora_indr_x(indr_t opr);
+void i_ora_indr_x(emustate* emu, indr_t opr);
 
 /*
 ASL - arithmetic shift left
 OPC: $16
 OPR: zero-page, X-indexed
 */
-void i_asl_indr_x(indr_t opr);
+void i_asl_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -196,14 +197,14 @@ CLC - clear carry
 OPC: $18
 OPR: implied
 */
-void i_clc();
+void i_clc(emustate* emu);
 
 /*
 ORA - or with accumulator
 OPC: $19
 OPR: absolute, Y-indexed
 */
-void i_ora_abs_y(abs_t opr);
+void i_ora_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -225,28 +226,28 @@ ORA - or with accumulator
 OPC: $1D
 OPR: absolute, X-indexed
 */
-void i_ora_abs_x(abs_t opr);
+void i_ora_abs_x(emustate* emu, abs_t opr);
 
 /*
 ASL - arithmetic shift left
 OPC: $1E
 OPR: absolute, X-indexed
 */
-void i_asl_abs_x(abs_t opr);
+void i_asl_abs_x(emustate* emu, abs_t opr);
 
 /*
 JSR - jump subroutine
 OPC: $20
 OPR: absolute
 */
-void i_jsr_abs(abs_t opr);
+void i_jsr_abs(emustate* emu, abs_t opr);
 
 /*
 AND - and
 OPC: $21
 OPR: X-indexed, indirect
 */
-void i_and_indr_x(indr_t opr);
+void i_and_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -263,21 +264,21 @@ BIT - bit test
 OPC: $24
 OPR: zero-page
 */
-void i_bit_zpg(zpg_t opr);
+void i_bit_zpg(emustate* emu, zpg_t opr);
 
 /*
 AND - and
 OPC: $25
 OPR: zero-page
 */
-void i_and_zpg(zpg_t opr);
+void i_and_zpg(emustate* emu, zpg_t opr);
 
 /*
 ROL - rotate left
 OPC: $26
 OPR: zero-page
 */
-void i_rol_zpg(zpg_t opr);
+void i_rol_zpg(emustate* emu, zpg_t opr);
 
 
 /*
@@ -290,21 +291,21 @@ PLP - pull processor status from stack
 OPC: $28
 OPR: implied
 */
-void i_plp();
+void i_plp(emustate* emu);
 
 /*
 AND - and
 OPC: $29
 OPR: immediate
 */
-void i_and_imd(imd_t opr);
+void i_and_imd(emustate* emu, imd_t opr);
 
 /*
 ROL - rotate left
 OPC: $2A
 OPR: accumulator
 */
-void i_rol_a();
+void i_rol_a(emustate* emu);
 
 /*
 RESERVED
@@ -316,21 +317,21 @@ BIT - bit test
 OPC: $2C
 OPR: absolute
 */
-void i_bit_abs(abs_t opr);
+void i_bit_abs(emustate* emu, abs_t opr);
 
 /*
 AND - and
 OPC: $2D
 OPR: absolute
 */
-void i_and_abs(abs_t opr);
+void i_and_abs(emustate* emu, abs_t opr);
 
 /*
 ROL - rotate left
 OPC: $2E
 OPR: absolute
 */
-void i_rol_abs(abs_t opr);
+void i_rol_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -342,14 +343,14 @@ BMI - branch on minus
 OPC: $30
 OPR: relative
 */
-void i_bmi_rel(rel_t opr);
+void i_bmi_rel(emustate* emu, rel_t opr);
 
 /*
 AND - and
 OPC: $31
 OPR: indirect, Y-indexed
 */
-void i_and_indr_y(indr_t opr);
+void i_and_indr_y(emustate* emu, indr_t opr);
 
 
 /*
@@ -372,14 +373,14 @@ AND - and
 OPC: $35
 OPR: zero-page, X-indexed
 */
-void i_and_zpg_x(zpg_t opr);
+void i_and_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 ROL - rotate left
 OPC: $36
 OPR: zero-page, X-indexed
 */
-void i_rol_zpg_x(zpg_t opr);
+void i_rol_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -391,14 +392,14 @@ SEC - set carry
 OPC: $38
 OPR: implied
 */
-void i_sec();
+void i_sec(emustate* emu);
 
 /*
 AND - and
 OPC: $39
 OPR: absolute, Y-indexed
 */
-void i_and_abs_y(abs_t opr);
+void i_and_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -420,14 +421,14 @@ AND - and
 OPC: $3D
 OPR: absolute, X-indexed
 */
-void i_and_abs_x(abs_t opr);
+void i_and_abs_x(emustate* emu, abs_t opr);
 
 /*
 ROL - rotate left
 OPC: $3E
 OPR: absolute, X-indexed
 */
-void i_rol_abs_x(abs_t opr);
+void i_rol_abs_x(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -439,14 +440,14 @@ RTI - return from interrupt
 OPC: $40
 OPR: implied
 */
-void i_rti();
+void i_rti(emustate* emu);
 
 /*
 EOR - exclusive or with accumulator
 OPC: $41
 OPR: X-indexed, indirect
 */
-void i_eor_indr_x(indr_t opr);
+void i_eor_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -468,14 +469,14 @@ EOR - exclusive or with accumulator
 OPC: $45
 OPR: zero-page
 */
-void i_eor_zpg(zpg_t opr);
+void i_eor_zpg(emustate* emu, zpg_t opr);
 
 /*
 LSR - logical shift right
 OPC: $46
 OPR: zero-page
 */
-void i_lsr_zpg(zpg_t opr);
+void i_lsr_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -487,21 +488,21 @@ PHA - push accumulator onto stack
 OPC: $48
 OPR: implied
 */
-void i_pha();
+void i_pha(emustate* emu);
 
 /*
 EOR - exclusive or
 OPC: $49
 OPR: immediate
 */
-void i_eor_imd(imd_t opr);
+void i_eor_imd(emustate* emu, imd_t opr);
 
 /*
 LSR - logical shift right
 OPC: $4A
 OPR: accumulator
 */
-void i_lsr_a();
+void i_lsr_a(emustate* emu);
 
 /*
 RESERVED
@@ -513,21 +514,21 @@ JMP - jump
 OPC: $4C
 OPR: absolute
 */
-void i_jmp_abs(abs_t opr);
+void i_jmp_abs(emustate* emu, abs_t opr);
 
 /*
 EOR - exclusive or
 OPC: $4D
 OPR: absolute
 */
-void i_eor_abs(abs_t opr);
+void i_eor_abs(emustate* emu, abs_t opr);
 
 /*
 LSR - logical shift right
 OPC: $4E
 OPR: absolute
 */
-void i_lsr_abs(abs_t opr);
+void i_lsr_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -539,14 +540,14 @@ BVC - branch on overflow clear
 OPC: $50
 OPR: relative
 */
-void i_bvc_rel(rel_t opr);
+void i_bvc_rel(emustate* emu, rel_t opr);
 
 /*
 EOR - exclusive or
 OPC: $51
 OPR: indirect, Y-indexed
 */
-void i_eor_indr_y(indr_t opr);
+void i_eor_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -567,14 +568,14 @@ EOR - exclusive or
 OPC: $55
 OPR: zero-page, X-indexed
 */
-void i_eor_zpg_x(zpg_t opr);
+void i_eor_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 LSR - logical shift right
 OPC: $56
 OPR: zero-page, X-indexed
 */
-void i_lsr_zpg_x(zpg_t opr);
+void i_lsr_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -586,14 +587,14 @@ CLI - clear interrupt disable
 OPC: $58
 OPR: implied
 */
-void i_cli();
+void i_cli(emustate* emu);
 
 /*
 EOR - exclusive or
 OPC: $59
 OPR: absolute, Y-indexed
 */
-void i_eor_abs_y(abs_t opr);
+void i_eor_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -615,28 +616,28 @@ EOR - exclusive or
 OPC: $5D
 OPR: absolute, X-indexed
 */
-void i_eor_abs_x(abs_t opr);
+void i_eor_abs_x(emustate* emu, abs_t opr);
 
 /*
 LSR - logical shift right
 OPC: $5E
 OPR: absolute, X-indexed
 */
-void i_lsr_abs_x(abs_t opr);
+void i_lsr_abs_x(emustate* emu, abs_t opr);
 
 /*
 RTS - return from subroutine
 OPC: $60
 OPR: implied
 */
-void i_rts();
+void i_rts(emustate* emu);
 
 /*
 ADC - add with carry
 OPC: $61
 OPR: X-indexed, indirect
 */
-void i_adc_indr_x(indr_t opr);
+void i_adc_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -658,14 +659,14 @@ ADC - add with carry
 OPC: $65
 OPR: zero-page
 */
-void i_adc_zpg(zpg_t opr);
+void i_adc_zpg(emustate* emu, zpg_t opr);
 
 /*
 ROR - rotate right
 OPC: $66
 OPR: zero-page
 */
-void i_ror_zpg(zpg_t opr);
+void i_ror_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -677,21 +678,21 @@ PLA - pull accumulator from stack
 OPC: $68
 OPR: implied
 */
-void i_pla();
+void i_pla(emustate* emu);
 
 /*
 ADC - add with carry
 OPC: $69
 OPR: immediate
 */
-void i_adc_imd(imd_t opr);
+void i_adc_imd(emustate* emu, imd_t opr);
 
 /*
 ROR - rotate right
 OPC: $6A
 OPR: accumulator
 */
-void i_ror_a();
+void i_ror_a(emustate* emu);
 
 /*
 RESERVED
@@ -703,21 +704,21 @@ JMP - jump
 OPC: $6C
 OPR: indirect
 */
-void i_jmp_indr(indr_t opr);
+void i_jmp_indr(emustate* emu, indr_t opr);
 
 /*
 ADC - add with carry
 OPC: $6D
 OPR: absolute
 */
-void i_adc_abs(abs_t opr);
+void i_adc_abs(emustate* emu, abs_t opr);
 
 /*
 ROR - rotate right
 OPC: $6E
 OPR: absolute
 */
-void i_ror_abs(abs_t opr);
+void i_ror_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -729,14 +730,14 @@ BVS - branch on overflow set
 OPC: $70
 OPR: relative
 */
-void i_bvs_rel(rel_t opr);
+void i_bvs_rel(emustate* emu, rel_t opr);
 
 /*
 ADC - add with carry
 OPC: $71
 OPR: indirect, Y-indexed
 */
-void i_adc_indr_y(indr_t opr);
+void i_adc_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -759,14 +760,14 @@ OPR: $75
 OPC: zero-page, X-indexed
 */
 
-void i_adc_zpg_x(zpg_t opr);
+void i_adc_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 ROR - rotate right
 OPR: $76
 OPC: zero-page, X-indexed
 */
-void i_ror_zpg_x(zpg_t opr);
+void i_ror_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -778,14 +779,14 @@ SEI - system interrupt disable
 OPC: $78
 OPR: implied
 */
-void i_sei();
+void i_sei(emustate* emu);
 
 /*
 ADC - add with carry
 OPC: $79
 OPR: absolute, Y-indexed
 */
-void i_adc_abs_y(abs_t opr);
+void i_adc_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -807,14 +808,14 @@ ADC - add with carry
 OPC: $7D
 OPR: absolute, X-indexed
 */
-void i_adc_abs_x(abs_t opr);
+void i_adc_abs_x(emustate* emu, abs_t opr);
 
 /*
 ROR - rotate right
 OPC: $7E
 OPR: absolute, X-indexed
 */
-void i_ror_abs_x(abs_t opr);
+void i_ror_abs_x(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -831,7 +832,7 @@ STA - store accumulator
 OPC: $81
 OPR: X-indexed, indirect
 */
-void i_sta_indr_x(indr_t opr);
+void i_sta_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -848,21 +849,21 @@ STY - store Y
 OPC: $84
 OPR: zero-page
 */
-void i_sty_zpg(zpg_t opr);
+void i_sty_zpg(emustate* emu, zpg_t opr);
 
 /*
 STA - store accumulator
 OPC: $85
 OPR: zero-page
 */
-void i_sta_zpg(zpg_t opr);
+void i_sta_zpg(emustate* emu, zpg_t opr);
 
 /*
 STX - store X
 OPC: $86
 OPR: zero-page
 */
-void i_stx_zpg(zpg_t opr);
+void i_stx_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -874,7 +875,7 @@ DEY - decrement Y
 OPC: $88
 OPR: implied
 */
-void i_dey();
+void i_dey(emustate* emu);
 
 /*
 RESERVED
@@ -886,7 +887,7 @@ TXA - transfer X to accumulator
 OPC: $8A
 OPR: implied
 */
-void i_txa();
+void i_txa(emustate* emu);
 
 /*
 RESERVED
@@ -898,21 +899,21 @@ STY - store Y
 OPC: $8C
 OPR: absolute
 */
-void i_sty_abs(abs_t opr);
+void i_sty_abs(emustate* emu, abs_t opr);
 
 /*
 STA - store accumulator
 OPR: $8D
 OPR: absolute
 */
-void i_sta_abs(abs_t opr);
+void i_sta_abs(emustate* emu, abs_t opr);
 
 /*
 STX - store X
 OPR: $8E
 OPR: absolute
 */
-void i_stx_abs(abs_t opr);
+void i_stx_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -924,14 +925,14 @@ BCC - branch on carry clear
 OPC: $90
 OPR: relative
 */
-void i_bcc_rel(rel_t opr);
+void i_bcc_rel(emustate* emu, rel_t opr);
 
 /*
 STA - store accumulator
 OPC: $91
 OPR: indirect, Y-indexed
 */
-void i_sta_indr_y(indr_t opr);
+void i_sta_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -948,21 +949,21 @@ STY - store Y
 OPC: $94
 OPR: zero-page, X-indexed
 */
-void i_sty_zpg_x(zpg_t opr);
+void i_sty_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 STA - store accumulator
 OPC: $95
 OPR: zero-page, X-indexed
 */
-void i_sta_zpg_x(zpg_t opr);
+void i_sta_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 STX - store X
 OPC: $96
 OPR: zero-page, Y-indexed
 */
-void i_stx_zpg_y(zpg_t opr);
+void i_stx_zpg_y(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -974,21 +975,21 @@ TYA - transfer Y to accumulator
 OPC: $98
 OPR: implied
 */
-void i_tya();
+void i_tya(emustate* emu);
 
 /*
 STA - store accumulator
 OPC: $99
 OPR: absolute, Y-indexed
 */
-void i_sta_abs_y(abs_t opr);
+void i_sta_abs_y(emustate* emu, abs_t opr);
 
 /*
 TXS - transfer X to stack pointer
 OPC: $9A
 OPR: implied
 */
-void i_txs();
+void i_txs(emustate* emu);
 
 /*
 RESERVED
@@ -1005,7 +1006,7 @@ STA - store accumulator
 OPC: $9D
 OPR: absolute, X-indexed
 */
-void i_sta_abs_x(abs_t opr);
+void i_sta_abs_x(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1022,21 +1023,21 @@ LDY - load Y
 OPC: $A0
 OPR: immediate
 */
-void i_ldy_imd(imd_t opr);
+void i_ldy_imd(emustate* emu, imd_t opr);
 
 /*
 LDA - load A
 OPC: $A1
 OPR: X-indexed, indirect
 */
-void i_lda_indr_x(indr_t opr);
+void i_lda_indr_x(emustate* emu, indr_t opr);
 
 /*
 LDX - load X
 OPC: $A2
 OPR: immediate
 */
-void i_ldx_imd(imd_t opr);
+void i_ldx_imd(emustate* emu, imd_t opr);
 
 /*
 RESERVED
@@ -1048,21 +1049,21 @@ LDY - load Y
 OPC: $A4
 OPR: zero-page
 */
-void i_ldy_zpg(zpg_t opr);
+void i_ldy_zpg(emustate* emu, zpg_t opr);
 
 /*
 LDA - load accumulator
 OPC: $A5
 OPR: zero-page
 */
-void i_ldy_zpg(zpg_t opr);
+void i_ldy_zpg(emustate* emu, zpg_t opr);
 
 /*
 LDX - load X
 OPC: $A6
 OPR: zero-page
 */
-void i_ldx_zpg(zpg_t opr);
+void i_ldx_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -1074,21 +1075,21 @@ TAY - transfer accumulator to Y
 OPC: $A8
 OPR: implied
 */
-void i_tay();
+void i_tay(emustate* emu);
 
 /*
 LDA - load accumulator
 OPC: $A9
 OPR: immediate
 */
-void i_lda_imd(imd_t opr);
+void i_lda_imd(emustate* emu, imd_t opr);
 
 /*
 TAX - transfer accumulator to X
 OPC: $AA
 OPR: implied
 */
-void i_tax();
+void i_tax(emustate* emu);
 
 /*
 RESERVED
@@ -1100,21 +1101,21 @@ LDY - load Y
 OPC: $AC
 OPR: absolute
 */
-void i_ldy_abs(abs_t opr);
+void i_ldy_abs(emustate* emu, abs_t opr);
 
 /*
 LDA - load accumulator
 OPC: $AD
 OPR: absolute
 */
-void i_lda_abs(abs_t opr);
+void i_lda_abs(emustate* emu, abs_t opr);
 
 /*
 LDX - load X
 OPC: $AE
 OPR: absolute
 */
-void i_ldx_abs(abs_t opr);
+void i_ldx_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1126,14 +1127,14 @@ BCS - branch on carry set
 OPC: $B0
 OPR: relative
 */
-void i_bcs_rel(rel_t opr);
+void i_bcs_rel(emustate* emu, rel_t opr);
 
 /*
 LDA - load accumulator
 OPC: $B1
 OPR: indirect, Y-indexed
 */
-void i_lda_indr_y(indr_t opr);
+void i_lda_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -1155,14 +1156,14 @@ CMP - compare with accumulator
 OPC: $B5
 OPR: zero-page, X-indexed
 */
-void i_cmp_zpg_x(zpg_t opr);
+void i_cmp_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 DEC - decrement
 OPC: $B6
 OPR: zero-page, X-indexed
 */
-void i_dec_zpg_x(zpg_t opr);
+void i_dec_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -1174,21 +1175,21 @@ CLV - clear overflow
 OPC: $B8
 OPR: implied
 */
-void i_clv();
+void i_clv(emustate* emu);
 
 /*
 LDA - load accumulator
 OPC: $B9
 OPR: absolute, Y-indexed
 */
-void i_lda_abs_y(abs_t opr);
+void i_lda_abs_y(emustate* emu, abs_t opr);
 
 /*
 TSX - transfer stack pointer to X
 OPC: $BA
 OPR: implied
 */
-void i_tsx();
+void i_tsx(emustate* emu);
 
 /*
 RESERVED
@@ -1200,21 +1201,21 @@ LDY - load Y
 OPC: $BC
 OPR: absolute, X-indexed
 */
-void i_ldy_abs_x(abs_t opr);
+void i_ldy_abs_x(emustate* emu, abs_t opr);
 
 /*
 LDA - load accumulator
 OPC: $BD
 OPR: absolute, X-indexed
 */
-void i_lda_abs_x(abs_t opr);
+void i_lda_abs_x(emustate* emu, abs_t opr);
 
 /*
 LDX - load X
 OPC: $BE
 OPR: absolute, Y-indexed
 */
-void i_ldx_abs_y(abs_t opr);
+void i_ldx_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1226,14 +1227,14 @@ CPY - compare with Y
 OPC: $C0
 OPR: immediate
 */
-void i_cpy_imd(imd_t opr);
+void i_cpy_imd(emustate* emu, imd_t opr);
 
 /*
 CMP - compare with accumulator
 OPC: $C1
 OPR: X-indexed, indirect
 */
-void i_cmp_indr_x(indr_t opr);
+void i_cmp_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -1250,21 +1251,21 @@ CPY - compare with Y
 OPC: $C4
 OPR: zero-page
 */
-void i_cpy_zpg(zpg_t opr);
+void i_cpy_zpg(emustate* emu, zpg_t opr);
 
 /*
 CMP - compare with accumulator
 OPC: $C5
 OPR: zero-page
 */
-void i_cmp_zpg(zpg_t opr);
+void i_cmp_zpg(emustate* emu, zpg_t opr);
 
 /*
 DEC - decrement
 OPC: $C6
 OPR: zero-page
 */
-void i_dec_zpg(zpg_t opr);
+void i_dec_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -1276,21 +1277,21 @@ INY - increment Y
 OPC: $C8
 OPR: implied
 */
-void i_iny();
+void i_iny(emustate* emu);
 
 /*
 CMP - compare with accumulator
 OPC: $C9
 OPR: immediate
 */
-void i_cmp_imd(imd_t opr);
+void i_cmp_imd(emustate* emu, imd_t opr);
 
 /*
 DEX - decrement X
 OPC: $CA
 OPR: implied
 */
-void i_dex();
+void i_dex(emustate* emu);
 
 /*
 RESERVED
@@ -1302,21 +1303,21 @@ CPY - compare with Y
 OPC: $CC
 OPR: absolute
 */
-void i_cpy_abs(abs_t opr);
+void i_cpy_abs(emustate* emu, abs_t opr);
 
 /*
 CMP - compare with accumulator
 OPC: $CD
 OPR: absolute
 */
-void i_cmp_abs(abs_t opr);
+void i_cmp_abs(emustate* emu, abs_t opr);
 
 /*
 DEC - decrement
 OPC: $CE
 OPR: absolute
 */
-void i_dec_abs(abs_t opr);
+void i_dec_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1328,14 +1329,14 @@ BNE - branch not equal
 OPC: $D0
 OPR: relative
 */
-void i_bne_rel(rel_t opr);
+void i_bne_rel(emustate* emu, rel_t opr);
 
 /*
 CMP - compare with accumulator
 OPC: $D1
 OPR: indirect, Y-indexed
 */
-void i_cmp_indr_y(indr_t opr);
+void i_cmp_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -1357,14 +1358,14 @@ CMP - compare with accumulator
 OPC: $D5
 OPR: zero-page, X-indexed
 */
-void i_cmp_zpg_x(zpg_t opr);
+void i_cmp_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 DEC - decrement
 OPC: $D6
 OPR: zero-page, X-indexed
 */
-void i_dec_zpg_x();
+void i_dec_zpg_x(emustate* emu);
 
 /*
 RESERVED
@@ -1376,14 +1377,14 @@ CLD - clear decimal
 OPC: $D8
 OPR: implied
 */
-void i_cld();
+void i_cld(emustate* emu);
 
 /*
 CMP - compare with accumulator
 OPC: $D9
 OPR: absolute, Y-indexed
 */
-void i_cmp_abs_y();
+void i_cmp_abs_y(emustate* emu);
 
 /*
 RESERVED
@@ -1405,14 +1406,14 @@ CMP - compare with accumulator
 OPC: $DD
 OPR: absolute, X-indexed
 */
-void i_cmp_abs_x(abs_t opr);
+void i_cmp_abs_x(emustate* emu, abs_t opr);
 
 /*
 DEC - decrement
 OPC: $DE
 OPR: absolute, X-indexed
 */
-void i_dec_abs_x(abs_t opr);
+void i_dec_abs_x(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1424,14 +1425,14 @@ CPX - compare with X
 OPC: $E0
 OPR: immediate
 */
-void i_cpx_imd(imd_t opr);
+void i_cpx_imd(emustate* emu, imd_t opr);
 
 /*
 SBC - subtract with carry
 OPC: $E1
 OPR: X-indexed, indirect
 */
-void i_sbc_indr_x(indr_t opr);
+void i_sbc_indr_x(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -1448,21 +1449,21 @@ CPX - compare with X
 OPC: $E4
 OPR: zero-page
 */
-void i_cpx_zpg(zpg_t opr);
+void i_cpx_zpg(emustate* emu, zpg_t opr);
 
 /*
 SBC - subtract with carry
 OPC: $E5
 OPR: zero-page
 */
-void i_sbc_zpg(zpg_t opr);
+void i_sbc_zpg(emustate* emu, zpg_t opr);
 
 /*
 INC - increment
 OPC: $E6
 OPR: zero-page
 */
-void i_inc_zpg(zpg_t opr);
+void i_inc_zpg(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -1474,21 +1475,21 @@ INX - increment X
 OPC: $E8
 OPR: implied
 */
-void i_inx();
+void i_inx(emustate* emu);
 
 /*
 SBC - subtract with carry
 OPC: $E9
 OPR: immediate
 */
-void i_sbc_imd(imd_t opr);
+void i_sbc_imd(emustate* emu, imd_t opr);
 
 /*
 NOP - no operation
 OPC: $EA
 OPR: implied
 */
-void i_nop();
+void i_nop(emustate* emu);
 
 /*
 RESERVED
@@ -1500,21 +1501,21 @@ CPX - compare with X
 OPC: $EC
 OPR: absolute
 */
-void i_cpx_abs(abs_t opr);
+void i_cpx_abs(emustate* emu, abs_t opr);
 
 /*
 SBC - subtract with carry
 OPC: $ED
 OPR: absolute
 */
-void i_sbc_abs(abs_t opr);
+void i_sbc_abs(emustate* emu, abs_t opr);
 
 /*
 INC - increment
 OPC: $EE
 OPR: absolute
 */
-void i_inc_abs(abs_t opr);
+void i_inc_abs(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1526,14 +1527,14 @@ BEQ - branch equal to
 OPC: $F0
 OPR: relative
 */
-void i_beq_rel(rel_t opr);
+void i_beq_rel(emustate* emu, rel_t opr);
 
 /*
 SBC - subtract with carry
 OPC: $F1
 OPR: indirect, Y-indexed
 */
-void i_sbc_indr_y(indr_t opr);
+void i_sbc_indr_y(emustate* emu, indr_t opr);
 
 /*
 RESERVED
@@ -1555,14 +1556,14 @@ SBC - subtract with carry
 OPC: $F5
 OPR: zero-page, X-indexed
 */
-void i_sbc_zpg_x(zpg_t opr);
+void i_sbc_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 INC - increment
 OPC: $F6
 OPR: zero-page, X-indexed
 */
-void i_inc_zpg_x(zpg_t opr);
+void i_inc_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -1574,14 +1575,14 @@ SED - set decimal
 OPC: $F8
 OPR: implied
 */
-void i_sed();
+void i_sed(emustate* emu);
 
 /*
 SBC - subtract with carry
 OPC: $F9
 OPR: absolute, Y-indexed
 */
-void i_sbc_abs_y(abs_t opr);
+void i_sbc_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
@@ -1603,7 +1604,7 @@ SBC - subtract with carry
 OPC: $FD
 OPR: absolute, X-indexed
 */
-void i_sbc_abs_x(abs_t opr);
+void i_sbc_abs_x(emustate* emu, abs_t opr);
 
 /*
 INC - increment
