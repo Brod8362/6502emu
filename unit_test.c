@@ -11,6 +11,11 @@ void reset_proc(emustate* emu) {
     emu->sr=(1 << 5); //bit 5 should always be set
     emu->x=0;
     emu->y=0;
+    for (int i = 0; i < 256; i++) {
+        for (int j = 0; j < 256; j++) {
+            emu->memory[i][j] = 0;
+        }
+    }
 }
 
 int main() {
@@ -76,6 +81,80 @@ int main() {
     assert(CHECK(emu.sr, FLAG_D) == 0);
     assert(CHECK(emu.sr, FLAG_V) == 0);
     assert(CHECK(emu.sr, FLAG_I) == 0);
+    
+    // test ADC 
+
+    reset_proc(&emu);
+
+    // 13 + 211 + CARRY = (A:255, C:0)
+    i_sec(&emu);
+    i_lda_imd(&emu, 13);
+    i_adc_imd(&emu, 211);
+    assert(emu.a == 225);
+    assert(CHECK(emu.sr, FLAG_C) == 0);
+
+    // 254 + 6 + CARRY = (A:5, C:1)
+    i_sec(&emu);
+    i_lda_imd(&emu, 254);
+    i_adc_imd(&emu, 6);
+    assert(emu.a == 5);
+    assert(CHECK(emu.sr, FLAG_C) == 1);
+
+    // 5 + 102 + CARRY = (A:108, C:0)
+    i_sec(&emu); //ensure carry bit is set
+    i_ldx_imd(&emu, 0x66); //load 0x66 into X
+    i_stx_abs(&emu, 0x2040); //store X at mem address $2040
+    i_adc_abs(&emu, 0x2040); //add accumulator to value at address $2040
+    assert(emu.a == 108);
+    assert(CHECK(emu.sr, FLAG_C) == 0);
+
+    //5 + 7 = (A:12, C: 0, V:0)
+    i_clc(&emu); // clear carry flag
+    i_lda_imd(&emu, 5); //load 5 into accumulator
+    i_adc_imd(&emu, 7); // 5 + 7
+    assert((int8_t)emu.a == 12);
+    assert(!CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_V)); //assert that C and V are not set
+
+    //127 + 2 = (A:-127, C:0, V:1)
+    i_clc(&emu); // clear carry flag
+    i_lda_imd(&emu, 127);
+    i_adc_imd(&emu, 2);
+    assert((int8_t)emu.a == -127);
+    assert(!CHECK(emu.sr, FLAG_C)); //C must not be set
+    assert(CHECK(emu.sr, FLAG_V));  //V must be set
+
+    //5 + -3 = (A:2, C:1, V:0)
+    i_clc(&emu); // clear carry flag
+    i_lda_imd(&emu, 5);
+    i_adc_imd(&emu, ~3+1); // 5 - 3 = 2
+    assert((int8_t)emu.a == 2);
+    assert(CHECK(emu.sr, FLAG_C)); //C must not be set
+    assert(!CHECK(emu.sr, FLAG_V));  //V must not be set
+
+    //5 + -7 = (A:-2, C:0, V:0)
+    i_clc(&emu);
+    i_lda_imd(&emu, 5);
+    i_adc_imd(&emu, ~7+1); // 5 + -7 = -2
+    assert((int8_t)emu.a == -2); 
+    assert(!CHECK(emu.sr, FLAG_C)); //C must not be set
+    assert(CHECK(emu.sr, FLAG_V));  //V must be set
+
+    //-5 + -7 = (A: -12, C:1, V:0)
+    i_clc(&emu);
+    i_lda_imd(&emu, ~5+1);
+    i_adc_imd(&emu, ~7+1);
+    assert((int8_t)emu.a == -12);
+    assert(CHECK(emu.sr, FLAG_C)); //C must not be set
+    assert(!CHECK(emu.sr, FLAG_V));  //V not must be set
+
+    //-66 + -55 = (A:125, C:1, V:1)
+    i_clc(&emu);
+    i_lda_imd(&emu, ~66+1);
+    i_adc_imd(&emu, ~65+1);
+    assert((int8_t)emu.a == 125);
+    assert(CHECK(emu.sr, FLAG_C)); //C must be set
+    assert(CHECK(emu.sr, FLAG_V));  //V must be set
 
     printf("All tests passed.\n");
     return 0;

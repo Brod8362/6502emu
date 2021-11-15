@@ -36,7 +36,55 @@ void g_adc(emustate* emu, uint8_t opr) {
         CLEAR(emu->sr, FLAG_Z);
     }  
 
+    if (CHECK(s, 7) != CHECK(emu->a, 7)) {
+        SET(emu->sr, FLAG_V);
+    } else {
+        CLEAR(emu->sr, FLAG_V);
+    }
+    //TODO verify this is how overflow flag works
+
     emu->a = s & 0xFF;
+}
+
+cycles_t i_adc_indr_x(emustate* emu, indr_t opr) {
+    //TODO
+    return 6;
+}
+
+cycles_t i_adc_zpg(emustate* emu, zpg_t opr) {
+    g_adc(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_adc_imd(emustate* emu, imd_t opr) {
+    g_adc(emu, opr);
+    return 2;
+}
+
+cycles_t i_adc_abs(emustate* emu, abs_t opr) {
+    g_adc(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
+cycles_t i_adc_indr_y(emustate* emu, abs_t opr) {
+    //TODO
+    return 5; //*
+}
+
+cycles_t i_adc_zpg_x(emustate* emu, zpg_t opr) {
+    g_adc(emu, emu->memory[0][opr+emu->x]);
+    return 4;
+}
+
+cycles_t i_adc_abs_y(emustate* emu, abs_t opr) {
+    //TODO 
+    return 4; //*
+}
+
+cycles_t i_adc_abs_x(emustate* emu, abs_t opr) {
+    int adr = emu->x+opr;
+    g_adc(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
 }
 
 // AND instruction
