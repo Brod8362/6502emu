@@ -324,8 +324,8 @@ cycles_t i_clv(emustate* emu) {
 
 // CMP instruction
 
-void g_cmp(emustate* emu, uint8_t opr) {
-    uint8_t res = emu->a - opr;
+void g_comp_generic(emustate* emu, uint8_t reg, uint8_t opr) {
+    uint8_t res = reg - opr;
     if (!res)
         SET(emu->sr, FLAG_Z);
     else
@@ -336,10 +336,14 @@ void g_cmp(emustate* emu, uint8_t opr) {
     else 
         CLEAR(emu->sr, FLAG_N); 
 
-    if (opr <= emu->a)
+    if (opr <= reg)
         SET(emu->sr, FLAG_C);
     else
         CLEAR(emu->sr, FLAG_C);
+}
+
+void g_cmp(emustate* emu, uint8_t opr) {
+    g_comp_generic(emu, emu->a, opr);
 }
 
 cycles_t i_cmp_zpg_x(emustate* emu, zpg_t opr) {
@@ -384,7 +388,47 @@ cycles_t i_cmp_abs_x(emustate* emu, abs_t opr) {
 }
 
 // CPX instruction
+
+void g_cpx(emustate* emu, uint8_t opr) {
+    g_comp_generic(emu, emu->x, opr);
+}
+
+cycles_t i_cpx_imd(emustate* emu, imd_t opr) {
+    g_cpx(emu, opr);
+    return 2;
+}
+
+cycles_t i_cpx_zpg(emustate* emu, zpg_t opr) {
+    g_cpx(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_cpx_abs(emustate* emu, abs_t opr) {
+    g_cpx(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
 // CPY instruction
+
+void g_cpy(emustate* emu, uint8_t opr) {
+    g_comp_generic(emu, emu->y, opr);
+}
+
+cycles_t i_cpy_imd(emustate* emu, imd_t opr) {
+    g_cpy(emu, opr);
+    return 2;
+}
+
+cycles_t i_cpy_zpg(emustate* emu, zpg_t opr) {
+    g_cpy(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_cpy_abs(emustate* emu, abs_t opr) {
+    g_cpy(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
 // DEC instruction
 
 void g_decr(emustate* emu, uint8_t* reg) {

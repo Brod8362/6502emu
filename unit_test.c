@@ -409,6 +409,40 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_Z));
     assert(!CHECK(emu.sr, FLAG_N));
     assert(CHECK(emu.sr, FLAG_C));
+
+    //test CPX
+    i_ldx_imd(&emu, 0x30);
+    i_cpx_imd(&emu, 0x30);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
+
+    i_cpx_imd(&emu, 0x31);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+    assert(!CHECK(emu.sr, FLAG_C));
+
+    i_cpx_imd(&emu, 0x29);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
+
+    //test CPY
+    i_ldy_imd(&emu, 0x40);
+    i_cpy_imd(&emu, 0x40);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
+
+    i_cpy_imd(&emu, 0x41);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+    assert(!CHECK(emu.sr, FLAG_C));
+
+    i_cpy_imd(&emu, 0x39);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
     
 
     printf("All tests passed.\n");
