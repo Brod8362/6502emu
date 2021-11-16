@@ -551,6 +551,50 @@ cycles_t i_ldy_abs_x(emustate* emu, abs_t opr) {
 }
 
 // LSR instruction
+
+void g_lsr(emustate* emu, uint8_t* opr) {
+    CLEAR(emu->sr, FLAG_N); //always reset
+
+    if (CHECK(*opr, 0))
+        SET(emu->sr, FLAG_C);
+    else
+        CLEAR(emu->sr, FLAG_C);
+
+    *opr >>= 1;
+
+    if (*opr == 0)
+        SET(emu->sr, FLAG_Z);
+    else
+        CLEAR(emu->sr, FLAG_Z);
+}
+
+
+cycles_t i_lsr_zpg(emustate* emu, zpg_t opr) {
+    g_lsr(emu, &emu->memory[0][opr]);
+    return 5;
+}
+
+cycles_t i_lsr_a(emustate* emu) {
+    g_lsr(emu, &emu->a);
+    return 2;
+}
+
+cycles_t i_lsr_abs(emustate* emu, abs_t opr) {
+    g_lsr(emu, &emu->memory[opr/256][opr%256]);
+    return 6;
+}
+
+cycles_t i_lsr_zpg_x(emustate* emu, zpg_t opr) {
+    g_lsr(emu, &emu->memory[0][opr+emu->x]);
+    return 6;
+}
+
+cycles_t i_lsr_abs_x(emustate* emu, abs_t opr) {
+    uint16_t adr  = opr+emu->x;
+    g_lsr(emu, &emu->memory[adr/256][adr%256]);
+    return 7;
+}
+
 // NOP instruction
 
 cycles_t i_nop(emustate* emu) {

@@ -354,6 +354,22 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_Z));
     assert(CHECK(emu.sr, FLAG_N));
 
+    //test LSR
+    reset_proc(&emu);
+    i_lda_imd(&emu, 80);
+    i_lsr_a(&emu);
+    assert(emu.a == 40);
+    assert(!CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 1);
+    i_lsr_a(&emu);
+    assert(emu.a == 0);
+    assert(CHECK(emu.sr, FLAG_C));
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+
     printf("All tests passed.\n");
     return 0;
 }
