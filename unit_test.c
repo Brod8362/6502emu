@@ -235,6 +235,23 @@ int main() {
     assert(CHECK(emu.sr, FLAG_Z));
     assert(!CHECK(emu.sr, FLAG_N));
 
+    //test ASL
+    i_lda_imd(&emu, 8);
+    i_asl_a(&emu);
+    assert(emu.a == 16);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(!CHECK(emu.sr, FLAG_C));
+
+    i_lda_imd(&emu, 0b10000000);
+    i_sta_abs(&emu, 0x5020);
+    i_asl_abs(&emu, 0x5020);
+    assert(emu.memory[0x50][0x20] == 0);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
+    
+
     printf("All tests passed.\n");
     return 0;
 }

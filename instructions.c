@@ -1,7 +1,5 @@
 #include "instructions.h"
 
-
-
 /*
 
 *: 
@@ -146,10 +144,23 @@ cycles_t i_and_abs_x(emustate* emu, abs_t opr) {
 // ASL instruction
 
 void g_asl(emustate* emu, uint8_t* opr) {
-    if (CHECK(*opr, 7))
+    if (CHECK(*opr, 7)) //todo optimize this?
         SET(emu->sr, FLAG_C);
+    else
+        CLEAR(emu->sr, FLAG_C);
+
     *opr <<= 1;
-    //todo verify this is acutally what it does
+
+    if (*opr == 0)
+        SET(emu->sr, FLAG_Z);
+    else
+        CLEAR(emu->sr, FLAG_Z);
+
+    if (CHECK(*opr, 7))
+        SET(emu->sr, FLAG_N);
+    else
+        CLEAR(emu->sr, FLAG_N);
+
 }
 
 cycles_t i_asl_zpg(emustate* emu, zpg_t opr) {
