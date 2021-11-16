@@ -1,8 +1,8 @@
 #include "instructions.h"
 #include <stdlib.h> //for NULL
 
-#define ADDR(e,x) e->memory[x/256][x%256]
-#define ZPG(e,x) e->memory[0][x]
+#define ADDR(e,x) e->memory[(x)/256][(x)%256]
+#define ZPG(e,x) e->memory[0][(x)%256]
 
 /*
 
@@ -144,7 +144,7 @@ cycles_t i_and_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_and_abs(emustate* emu, abs_t opr) {
-    g_and(emu, emu->memory[opr/256][opr%256]);
+    g_and(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -193,7 +193,7 @@ void g_asl(emustate* emu, uint8_t* opr) {
 }
 
 cycles_t i_asl_zpg(emustate* emu, zpg_t opr) {
-    g_asl(emu, &emu->memory[0][opr]);   
+    g_asl(emu, &ZPG(emu, opr));   
     return 5; 
 }
 
@@ -203,18 +203,17 @@ cycles_t i_asl_a(emustate* emu) {
 }
 
 cycles_t i_asl_abs(emustate* emu, abs_t opr) {
-    g_asl(emu, &emu->memory[opr/256][opr%256]);
+    g_asl(emu, &ADDR(emu, opr));
     return 6;
 }
 
 cycles_t i_asl_zpg_x(emustate* emu, zpg_t opr) {
-    g_asl(emu, &emu->memory[0][opr+emu->x]);
+    g_asl(emu, &ZPG(emu, opr+emu->x));
     return 6;
 }
 
 cycles_t i_asl_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = opr+emu->x;
-    g_asl(emu, &emu->memory[adr/256][adr%256]);
+    g_asl(emu, &ADDR(emu, opr+emu->x));
     return 7;
 }
 
@@ -265,12 +264,12 @@ void g_bit(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_bit_zpg(emustate* emu, zpg_t opr) {
-    g_bit(emu, emu->memory[0][opr]);
+    g_bit(emu, ZPG(emu, opr));
     return 3;
 }
 
 cycles_t i_bit_abs(emustate* emu, abs_t opr) {
-    g_bit(emu, emu->memory[opr/256][opr%256]);
+    g_bit(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -377,7 +376,7 @@ void g_cmp(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_cmp_zpg_x(emustate* emu, zpg_t opr) {
-    g_cmp(emu, emu->memory[0][opr+emu->x]);
+    g_cmp(emu, ZPG(emu, opr+emu->x));
     return 4;
 }
 
@@ -386,7 +385,7 @@ cycles_t i_cmp_indr_x(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_cmp_zpg(emustate* emu, zpg_t opr) {
-    g_cmp(emu, emu->memory[0][opr]);
+    g_cmp(emu, ZPG(emu, opr));
     return 3;
 }
 
@@ -396,7 +395,7 @@ cycles_t i_cmp_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_cmp_abs(emustate* emu, abs_t opr) {
-    g_cmp(emu, emu->memory[opr/256][opr%256]);
+    g_cmp(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -405,14 +404,12 @@ cycles_t i_cmp_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_cmp_abs_y(emustate* emu, abs_t opr) {
-    uint16_t adr = opr+emu->y;
-    g_cmp(emu, emu->memory[adr/256][adr%256]);
+    g_cmp(emu, ADDR(emu, opr+emu->y));
     return 4; //*
 }
 
 cycles_t i_cmp_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = opr+emu->x;
-    g_cmp(emu, emu->memory[adr/256][adr%256]);
+    g_cmp(emu, ADDR(emu, opr+emu->x));
     return 4; //*
     return 4; //*
 }
@@ -429,12 +426,12 @@ cycles_t i_cpx_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_cpx_zpg(emustate* emu, zpg_t opr) {
-    g_cpx(emu, emu->memory[0][opr]);
+    g_cpx(emu, ZPG(emu, opr));
     return 3;
 }
 
 cycles_t i_cpx_abs(emustate* emu, abs_t opr) {
-    g_cpx(emu, emu->memory[opr/256][opr%256]);
+    g_cpx(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -450,12 +447,12 @@ cycles_t i_cpy_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_cpy_zpg(emustate* emu, zpg_t opr) {
-    g_cpy(emu, emu->memory[0][opr]);
+    g_cpy(emu, ZPG(emu, opr));
     return 3;
 }
 
 cycles_t i_cpy_abs(emustate* emu, abs_t opr) {
-    g_cpy(emu, emu->memory[opr/256][opr%256]);
+    g_cpy(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -478,23 +475,22 @@ void g_decr(emustate* emu, uint8_t* reg) {
 }
 
 cycles_t i_dec_zpg(emustate* emu, zpg_t opr) {
-    g_decr(emu, &emu->memory[0][opr]);
+    g_decr(emu, &ZPG(emu, opr));
     return 5;
 }
 
 cycles_t i_dec_abs(emustate* emu, abs_t opr) {
-    g_decr(emu, &emu->memory[opr/256][opr%256]);
+    g_decr(emu, &ADDR(emu, opr));
     return 6;
 }
 
 cycles_t i_dec_zpg_x(emustate* emu, zpg_t opr) {
-    g_decr(emu, &emu->memory[0][opr+emu->x]);
+    g_decr(emu, &ZPG(emu, opr+emu->x));
     return 6;
 }
 
 cycles_t i_dec_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = opr+emu->x;
-    g_decr(emu, &emu->memory[adr/256][adr%256]);
+    g_decr(emu, &ADDR(emu, opr+emu->x));
     return 7;
 }
 
@@ -536,7 +532,7 @@ cycles_t i_eor_indr_x(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_eor_zpg(emustate* emu, zpg_t opr) {
-    g_eor(emu, emu->memory[0][opr]);
+    g_eor(emu, ZPG(emu, opr));
     return 3;
 }
 
@@ -546,7 +542,7 @@ cycles_t i_eor_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_eor_abs(emustate* emu, abs_t opr) {
-    g_eor(emu, emu->memory[opr/256][opr%256]);
+    g_eor(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -556,19 +552,17 @@ cycles_t i_eor_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_eor_zpg_x(emustate* emu, zpg_t opr) {
-    g_eor(emu, emu->memory[0][opr+emu->x]);
+    g_eor(emu, ZPG(emu, opr+emu->x));
     return 4;
 }
 
 cycles_t i_eor_abs_y(emustate* emu, abs_t opr) {
-    uint16_t adr = opr + emu->y;
-    g_eor(emu, emu->memory[adr/256][adr%256]);
+    g_eor(emu, ADDR(emu, opr+emu->y));
     return 4; //*
 }
 
 cycles_t i_eor_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = opr + emu->x;
-    g_eor(emu, emu->memory[adr/256][adr%256]);
+    g_eor(emu, ADDR(emu, opr+emu->x));
     return 4; //*  
 }
 
@@ -591,23 +585,22 @@ void g_incr(emustate* emu, uint8_t* reg) {
 }
 
 cycles_t i_inc_zpg(emustate* emu, zpg_t opr) {
-    g_incr(emu, &emu->memory[0][opr]);
+    g_incr(emu, &ZPG(emu, opr));
     return 5;
 }
 
 cycles_t i_inc_abs(emustate* emu, abs_t opr) {
-    g_incr(emu, &emu->memory[opr/256][opr%256]);
+    g_incr(emu, &ADDR(emu, opr));
     return 6;
 }
 
 cycles_t i_inc_zpg_x(emustate* emu, zpg_t opr) {
-    g_incr(emu, &emu->memory[0][opr+emu->x]);
+    g_incr(emu, &ZPG(emu, opr+emu->x));
     return 6;
 }
 
 cycles_t i_inc_abs_x(emustate* emu, abs_t opr) {
-    int adr = opr+emu->x;
-    g_incr(emu, &emu->memory[adr/256][adr%256]);
+    g_incr(emu, &ADDR(emu, opr+emu->x));
     return 7;
 }
 
@@ -633,7 +626,7 @@ cycles_t i_jmp_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_jmp_indr(emustate* emu, indr_t opr) {
-    emu->pc = emu->memory[opr/256][opr%256];
+    emu->pc = ADDR(emu, opr);
     return 5;
 }
 
@@ -650,7 +643,7 @@ cycles_t i_jsr_abs(emustate* emu, abs_t opr) {
 
 cycles_t i_lda_indr_x(emustate* emu, indr_t opr) {
     abs_t adr = u_fetch_indr_x(emu, opr);
-    emu->a = emu->memory[adr/256][adr%256];
+    emu->a = ADDR(emu, adr);
     return 6;
 }
 
@@ -660,31 +653,29 @@ cycles_t i_lda_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_lda_abs(emustate* emu, abs_t opr) {
-    emu->a = emu->memory[opr/256][opr%256];
+    emu->a = ADDR(emu, opr);
     return 4;
 }
 
 cycles_t i_lda_indr_y(emustate* emu, indr_t opr) {
     cycles_t xtra = 0;
     abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
-    emu->a = emu->memory[adr/256][adr%256];
+    emu->a = ADDR(emu, adr);
     return 5 + xtra; //*
 }
 
 cycles_t i_lda_abs_y(emustate* emu, abs_t opr) {
-    abs_t adr = opr+emu->y;
-    emu->a = emu->memory[adr/256][adr%256];
+    emu->a = ADDR(emu, opr+emu->y);
     return 4; //*
 }
 
 cycles_t i_lda_abs_x(emustate* emu, abs_t opr) {
-    abs_t adr = opr+emu->x;
-    emu->a = emu->memory[adr/256][adr%256];
+    emu->a = ADDR(emu, opr+emu->x);
     return 4; //*
 }
 
 cycles_t i_lda_zpg_x(emustate* emu, zpg_t opr) {
-    emu->a = emu->memory[0][opr+emu->x];
+    emu->a = ZPG(emu, opr+emu->x);
     return 4;
 }
 
@@ -696,23 +687,22 @@ cycles_t i_ldx_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_ldx_zpg(emustate* emu, zpg_t opr) {
-    emu->x = emu->memory[0][opr];
+    emu->x = ZPG(emu, opr);
     return 3;
 }
 
 cycles_t i_ldx_abs(emustate* emu, abs_t opr) {
-    emu->x = emu->memory[opr/256][opr%256];
+    emu->x = ADDR(emu, opr);
     return 4;
 }
 
 cycles_t i_ldx_zpg_y(emustate* emu, zpg_t opr) {
-    emu->x = emu->memory[0][opr+emu->y];
+    emu->x = ZPG(emu, opr+emu->y);
     return 4;
 }
 
 cycles_t i_ldx_abs_y(emustate* emu, abs_t opr) {
-    uint8_t adr = opr+emu->y;
-    emu-> x = emu->memory[adr/256][adr%256];
+    emu-> x = ZPG(emu, opr+emu->y);
     return 4; //*
 }
 
@@ -724,23 +714,22 @@ cycles_t i_ldy_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_ldy_zpg(emustate* emu, zpg_t opr) {
-    emu->y = emu->memory[0][opr];
+    emu->y = ZPG(emu, opr);
     return 3;
 }
 
 cycles_t i_ldy_zpg_x(emustate* emu, zpg_t opr) {
-    emu->y = emu->memory[0][emu->x+opr];
+    emu->y = ZPG(emu, opr+emu->x);
     return 4;
 }
 
 cycles_t i_ldy_abs(emustate* emu, abs_t opr) {
-    emu->y = emu->memory[opr/256][opr%256];
+    emu->y = ADDR(emu, opr);
     return 4;
 }
 
 cycles_t i_ldy_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = emu->x+opr;
-    emu->y = emu->memory[adr/256][adr%256];
+    emu->y = ADDR(emu, emu->x+opr);
     return 4; //*
 }
 
@@ -764,7 +753,7 @@ void g_lsr(emustate* emu, uint8_t* opr) {
 
 
 cycles_t i_lsr_zpg(emustate* emu, zpg_t opr) {
-    g_lsr(emu, &emu->memory[0][opr]);
+    g_lsr(emu, &ZPG(emu, opr));
     return 5;
 }
 
@@ -774,18 +763,17 @@ cycles_t i_lsr_a(emustate* emu) {
 }
 
 cycles_t i_lsr_abs(emustate* emu, abs_t opr) {
-    g_lsr(emu, &emu->memory[opr/256][opr%256]);
+    g_lsr(emu, &ADDR(emu, opr));
     return 6;
 }
 
 cycles_t i_lsr_zpg_x(emustate* emu, zpg_t opr) {
-    g_lsr(emu, &emu->memory[0][opr+emu->x]);
+    g_lsr(emu, &ZPG(emu, opr+emu->x));
     return 6;
 }
 
 cycles_t i_lsr_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr  = opr+emu->x;
-    g_lsr(emu, &emu->memory[adr/256][adr%256]);
+    g_lsr(emu, &ADDR(emu, opr+emu->x));
     return 7;
 }
 
@@ -816,7 +804,7 @@ cycles_t i_ora_indr_x(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_ora_zpg(emustate* emu, zpg_t opr) {
-    g_ora(emu, emu->memory[0][opr]);
+    g_ora(emu, ZPG(emu, opr));
     return 3;
 }
 
@@ -826,7 +814,7 @@ cycles_t i_ora_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_ora_abs(emustate* emu, abs_t opr) {
-    g_ora(emu, emu->memory[opr/256][opr%256]);
+    g_ora(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -836,19 +824,17 @@ cycles_t i_ora_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_ora_zpg_x(emustate* emu, zpg_t opr) {
-    g_ora(emu, emu->x+opr);
+    g_ora(emu, ZPG(emu, opr+emu->x));
     return 4;
 }
 
 cycles_t i_ora_abs_y(emustate* emu, abs_t opr) {
-    int adr = opr+emu->y;
-    g_ora(emu, emu->memory[adr/256][adr%256]);
+    g_ora(emu, ADDR(emu, opr+emu->y));
     return 4; //*
 }
 
 cycles_t i_ora_abs_x(emustate* emu, abs_t opr) {
-    int adr = opr+emu->x;
-    g_ora(emu, emu->memory[adr/256][adr%256]);
+    g_ora(emu, ADDR(emu, opr+emu->x));
     return 4; //*
 }
 
@@ -856,7 +842,6 @@ cycles_t i_ora_abs_x(emustate* emu, abs_t opr) {
 
 cycles_t i_pha(emustate* emu) {
     emu->memory[1][emu->sp--] = emu->a;
-
     return 3;
 }
 
@@ -905,7 +890,7 @@ void g_rol(emustate* emu, uint8_t* opr) {
 }
 
 cycles_t i_rol_zpg(emustate* emu, zpg_t opr) {
-    g_rol(emu, &emu->memory[0][opr]);
+    g_rol(emu, &ZPG(emu, opr));
     return 5;
 }
 
@@ -915,18 +900,17 @@ cycles_t i_rol_a(emustate* emu) {
 }
 
 cycles_t i_rol_abs(emustate* emu, abs_t opr) {
-    g_rol(emu, &emu->memory[opr/256][opr%256]);
+    g_rol(emu, &ADDR(emu, opr));
     return 6;
 }
 
 cycles_t i_rol_zpg_x(emustate* emu, zpg_t opr) {
-    g_rol(emu, &emu->memory[0][opr+emu->a]);
+    g_rol(emu, &ZPG(emu, opr+emu->x));
     return 6;
 }
 
 cycles_t i_rol_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = opr+emu->x;
-    g_rol(emu, &emu->memory[adr/256][adr%256]);
+    g_rol(emu, &ADDR(emu, opr+emu->x));
     return 7;
 }
 
@@ -954,7 +938,7 @@ void g_ror(emustate* emu, uint8_t* opr) {
 }
 
 cycles_t i_ror_zpg(emustate* emu, zpg_t opr) {
-    g_ror(emu, &emu->memory[0][opr]);
+    g_ror(emu, &ZPG(emu, opr));
     return 5;
 }
 
@@ -964,18 +948,17 @@ cycles_t i_ror_a(emustate* emu) {
 }
 
 cycles_t i_ror_abs(emustate* emu, abs_t opr) {
-    g_ror(emu, &emu->memory[opr/256][opr%256]);
+    g_ror(emu, &ADDR(emu, opr));
     return 6;
 }
 
 cycles_t i_ror_zpg_x(emustate* emu, zpg_t opr) {
-    g_ror(emu, &emu->memory[0][opr+emu->a]);
+    g_ror(emu, &ZPG(emu, opr+emu->x));
     return 6;
 }
 
 cycles_t i_ror_abs_x(emustate* emu, abs_t opr) {
-    uint16_t adr = opr+emu->x;
-    g_ror(emu, &emu->memory[adr/256][adr%256]);
+    g_ror(emu, &ADDR(emu, emu->x+opr));
     return 7;
 }
 
@@ -1035,7 +1018,7 @@ cycles_t i_sbc_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_sbc_abs(emustate* emu, abs_t opr) {
-    g_sbc(emu, emu->memory[opr/256][opr%256]);
+    g_sbc(emu, ADDR(emu, opr));
     return 4;
 }
 
@@ -1044,18 +1027,17 @@ cycles_t i_sbc_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_sbc_zpg_x(emustate* emu, zpg_t opr) {
-    g_sbc(emu, emu->memory[0][opr+emu->x]);
+    g_sbc(emu, ZPG(emu, opr+emu->x));
     return 4;
 }
 
 cycles_t i_sbc_abs_y(emustate* emu, abs_t opr) {
-    g_sbc(emu, emu->memory[0][opr+emu->y]);
+    g_sbc(emu, ADDR(emu, opr+emu->y));
     return 4; //*
 }
 
 cycles_t i_sbc_abs_x(emustate* emu, abs_t opr) {
-    int adr = opr+emu->x;
-    g_sbc(emu, emu->memory[adr/256][adr%256]);
+    g_sbc(emu, ADDR(emu, opr+emu->x));
     return 4; //*
 }
 
@@ -1087,12 +1069,12 @@ cycles_t i_sta_indr_x(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_sta_zpg(emustate* emu, zpg_t opr) {
-    emu->memory[0][opr] = emu->a;
+    ZPG(emu, opr) = emu->a;
     return 3;
 }
 
 cycles_t i_sta_abs(emustate* emu, abs_t opr) {
-    emu->memory[opr/256][opr%256] = emu->a;
+    ADDR(emu,opr) = emu->a;
     return 4;
 }
 
@@ -1101,7 +1083,7 @@ cycles_t i_sta_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_sta_zpg_x(emustate* emu, zpg_t opr) {
-    emu->memory[0][opr+emu->x] = emu->a;
+    ZPG(emu, opr+emu->x) = emu->a;
     return 4;
 }
 
@@ -1110,42 +1092,41 @@ cycles_t i_sta_abs_y(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_sta_abs_x(emustate* emu, abs_t opr) {
-    int adr = opr+emu->x;
-    emu->memory[adr/256][adr%256] = emu->a;
+    ADDR(emu, opr+emu->x) = emu->a;
     return 5;
 }
 
 // STX instruction
 
 cycles_t i_stx_zpg(emustate* emu, zpg_t opr) {
-    emu->memory[0][opr] = emu->x;
+    ZPG(emu, opr) = emu->x;
     return 3;
 }
 
 cycles_t i_stx_abs(emustate* emu, abs_t opr) {
-    emu->memory[opr/256][opr%256] = emu->x;
+    ADDR(emu, opr) = emu->x;
     return 4;
 }
 
 cycles_t i_stx_zpg_y(emustate* emu, zpg_t opr) {
-    emu->memory[0][opr+emu->y] = emu->x;
+    ZPG(emu, opr+emu->y) = emu->x;
     return 4;
 }
 
 // STY instruction
 
 cycles_t i_sty_zpg(emustate* emu, zpg_t opr) {
-    emu->memory[0][opr] = emu->y;
+    ZPG(emu, opr) = emu->y;
     return 3;
 }
 
 cycles_t i_sty_abs(emustate* emu, abs_t opr) {
-    emu->memory[opr/256][opr%256] = emu->y;
+    ADDR(emu, opr) = emu->y;
     return 4;
 }
 
 cycles_t i_sty_zpg_x(emustate* emu, zpg_t opr) {
-    emu->memory[0][opr+emu->x] = emu->y;
+    ZPG(emu, opr+emu->x) = emu->y;
     return 4;
 }
 
