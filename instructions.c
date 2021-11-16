@@ -15,11 +15,16 @@
 
 */
 
+/*
+emustate* emu: the emulator/processor state
+indr_t opr: address to index to find new address
+return: 16-bit address stored at address opr
+*/
 abs_t u_fetch_indr_x(emustate* emu, indr_t opr) {
     abs_t adr = opr+emu->x;
-    uint8_t lo = emu->memory[adr/256][adr%256];
+    uint8_t lo = ADDR(emu, adr);
     adr++;
-    uint8_t hi = emu->memory[adr/256][adr%256];
+    uint8_t hi = ADDR(emu, adr);
     return (lo | (hi << 8));
 }
 
@@ -27,8 +32,9 @@ abs_t u_fetch_indr_x(emustate* emu, indr_t opr) {
 emustate* emu: the emulator/processor state
 indr_t opr: address to index to find new address
 cycles_t* cycle_count: pointer to cycles_t which will include the extra # of cycles if a page boundary is crossed. (May be NULL)
+return: 16-bit address stored at address opr
 */
-cycles_t u_fetch_indr_y(emustate* emu, indr_t opr, cycles_t* cycle_count) {
+abs_t u_fetch_indr_y(emustate* emu, indr_t opr, cycles_t* cycle_count) {
     abs_t adr = opr;
     uint8_t lo = ADDR(emu, adr);
     adr++;
@@ -129,12 +135,12 @@ void g_and(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_and_indr_x(emustate* emu, indr_t opr) {
-    //TODO
+    g_and(emu, u_fetch_indr_x(emu, opr));
     return 6;
 }
 
 cycles_t i_and_zpg(emustate* emu, zpg_t opr) {
-    g_and(emu, emu->memory[0][opr]);
+    g_and(emu, ZPG(emu, opr));
     return 3;
 }
 
@@ -149,31 +155,31 @@ cycles_t i_and_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_and_indr_y(emustate* emu, indr_t opr) {
-    //TODO
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    g_and(emu, ADDR(emu, opr));
+    return 5 + xtra; //*
 }
 
 cycles_t i_and_zpg_x(emustate* emu, zpg_t opr) {
-    g_and(emu, emu->memory[0][opr+emu->x]);
+    g_and(emu, ZPG(emu, opr+emu->x));
     return 4;
 }
 
 cycles_t i_and_abs_y(emustate* emu, abs_t opr) {
-    int adr = opr+emu->y;
-    g_and(emu, emu->memory[adr/256][adr%256]);
+    g_and(emu, ADDR(emu, opr+emu->y));
     return 4; //*
 }
 
 cycles_t i_and_abs_x(emustate* emu, abs_t opr) {
-    int adr = opr+emu->x;
-    g_and(emu, emu->memory[adr/256][adr%256]);
+    g_and(emu, ADDR(emu, opr+emu->x));
     return 4; //*
 }
 
 // ASL instruction
 
 void g_asl(emustate* emu, uint8_t* opr) {
-    if (CHECK(*opr, 7)) //todo optimize this?
+    if (CHECK(*opr, 7))
         SET(emu->sr, FLAG_C);
     else
         CLEAR(emu->sr, FLAG_C);
@@ -381,6 +387,8 @@ cycles_t i_cmp_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_cmp_indr_x(emustate* emu, indr_t opr) {
+    int adr = u_fetch_indr_x(emu, opr);
+    g_cmp(emu, ADDR(emu, adr));
     return 6;
 }
 
@@ -400,7 +408,10 @@ cycles_t i_cmp_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_cmp_indr_y(emustate* emu, indr_t opr) {
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    g_cmp(emu, ADDR(emu, adr));
+    return 5 + xtra; //*
 }
 
 cycles_t i_cmp_abs_y(emustate* emu, abs_t opr) {
@@ -410,7 +421,6 @@ cycles_t i_cmp_abs_y(emustate* emu, abs_t opr) {
 
 cycles_t i_cmp_abs_x(emustate* emu, abs_t opr) {
     g_cmp(emu, ADDR(emu, opr+emu->x));
-    return 4; //*
     return 4; //*
 }
 
@@ -527,7 +537,8 @@ void g_eor(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_eor_indr_x(emustate* emu, indr_t opr) {
-    //TODO
+    int adr = u_fetch_indr_x(emu, opr);
+    g_eor(emu, ADDR(emu, adr));
     return 6;
 }
 
@@ -547,8 +558,10 @@ cycles_t i_eor_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_eor_indr_y(emustate* emu, indr_t opr) {
-    //TODO
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    g_eor(emu, ADDR(emu, adr));
+    return 5 + xtra; //*
 }
 
 cycles_t i_eor_zpg_x(emustate* emu, zpg_t opr) {
@@ -799,8 +812,9 @@ void g_ora(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_ora_indr_x(emustate* emu, indr_t opr) {
-    //TODO
-    return 6; //*
+    abs_t adr = u_fetch_indr_x(emu, opr);
+    g_ora(emu, ADDR(emu, adr));
+    return 6;
 }
 
 cycles_t i_ora_zpg(emustate* emu, zpg_t opr) {
@@ -819,8 +833,10 @@ cycles_t i_ora_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_ora_indr_y(emustate* emu, indr_t opr) {
-    //TODO
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    g_ora(emu, ADDR(emu, adr));
+    return 5 + xtra; //*
 }
 
 cycles_t i_ora_zpg_x(emustate* emu, zpg_t opr) {
@@ -1004,11 +1020,13 @@ void g_sbc(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_sbc_indr_x(emustate* emu, indr_t opr) {
+    abs_t adr = u_fetch_indr_x(emu, opr);
+    g_sbc(emu, ADDR(emu, adr));
     return 6;
 }
 
 cycles_t i_sbc_zpg(emustate* emu, zpg_t opr) {
-    g_sbc(emu, emu->memory[0][opr]);
+    g_sbc(emu, ZPG(emu, opr));
     return 3;
 }
 
@@ -1023,7 +1041,10 @@ cycles_t i_sbc_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_sbc_indr_y(emustate* emu, indr_t opr) {
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    g_sbc(emu, ADDR(emu, adr));
+    return 5 + xtra; //*
 }
 
 cycles_t i_sbc_zpg_x(emustate* emu, zpg_t opr) {
@@ -1065,6 +1086,8 @@ cycles_t i_sei(emustate* emu) {
 // STA instruction
 
 cycles_t i_sta_indr_x(emustate* emu, indr_t opr) {
+    int adr = u_fetch_indr_x(emu, opr);
+    ADDR(emu, adr) = emu->a;
     return 6;
 }
 
@@ -1079,6 +1102,8 @@ cycles_t i_sta_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_sta_indr_y(emustate* emu, indr_t opr) {
+    abs_t adr = u_fetch_indr_y(emu, opr, NULL);
+    ADDR(emu, adr) = emu->a;
     return 6;
 }
 
@@ -1088,6 +1113,7 @@ cycles_t i_sta_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_sta_abs_y(emustate* emu, abs_t opr) {
+    ADDR(emu, opr+emu->y) = emu->a;
     return 5;
 }
 
