@@ -619,15 +619,34 @@ cycles_t i_ora_abs_x(emustate* emu, abs_t opr) {
 }
 
 // PHA instruction
+
+cycles_t i_pha(emustate* emu) {
+    emu->memory[1][emu->sp--] = emu->a;
+
+    return 3;
+}
+
 // PHP insturction
 
 cycles_t i_php(emustate* emu) {
-    emu->memory[1][emu->sp++] = emu->sr;
+    emu->memory[1][emu->sp--] = emu->sr;
     return 3;
 }
 
 // PLA instruction
+
+cycles_t i_pla(emustate* emu) {
+    emu->a = emu->memory[1][++emu->sp];
+    return 4;
+}
+
 // PLP instruction
+
+cycles_t i_plp(emustate* emu) {
+    emu->sr = emu->memory[1][++emu->sp];
+    return 4;
+}
+
 // ROL instruction
 // ROR instruction
 // RTI instruction

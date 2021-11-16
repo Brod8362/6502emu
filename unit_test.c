@@ -7,7 +7,7 @@
 void reset_proc(emustate* emu) {
     emu->a=0;
     emu->pc=0;
-    emu->sp=0;
+    emu->sp=0xFF;
     emu->sr=(1 << 5); //bit 5 should always be set
     emu->x=0;
     emu->y=0;
@@ -321,7 +321,17 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_Z));
     assert(CHECK(emu.sr, FLAG_N));
 
-
+    //test PLP, PLA, PHP, PHA
+    reset_proc(&emu);
+    i_lda_imd(&emu, 20);
+    i_pha(&emu);
+    i_plp(&emu);
+    assert(emu.a == 20);
+    assert(emu.sr == 20);
+    emu.sr = 40;
+    i_php(&emu);
+    i_pla(&emu);
+    assert(emu.a == 40);
 
     printf("All tests passed.\n");
     return 0;
