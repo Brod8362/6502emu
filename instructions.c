@@ -1,8 +1,6 @@
 #include "instructions.h"
+#include "addr_idx.h"
 #include <stdlib.h> //for NULL
-
-#define ADDR(e,x) e->memory[(x)/256][(x)%256]
-#define ZPG(e,x) e->memory[0][(x)%256]
 
 /*
 
@@ -14,36 +12,6 @@
     add 2 to cycles if branch occurs to different page
 
 */
-
-/*
-emustate* emu: the emulator/processor state
-indr_t opr: address to index to find new address
-return: 16-bit address stored at address opr
-*/
-abs_t u_fetch_indr_x(emustate* emu, indr_t opr) {
-    abs_t adr = opr+emu->x;
-    uint8_t lo = ADDR(emu, adr);
-    adr++;
-    uint8_t hi = ADDR(emu, adr);
-    return (lo | (hi << 8));
-}
-
-/*
-emustate* emu: the emulator/processor state
-indr_t opr: address to index to find new address
-cycles_t* cycle_count: pointer to cycles_t which will include the extra # of cycles if a page boundary is crossed. (May be NULL)
-return: 16-bit address stored at address opr
-*/
-abs_t u_fetch_indr_y(emustate* emu, indr_t opr, cycles_t* cycle_count) {
-    abs_t adr = opr;
-    uint8_t lo = ADDR(emu, adr);
-    adr++;
-    uint8_t hi = ADDR(emu, adr);
-    if (cycle_count != NULL) {
-        *cycle_count = ((adr/256) - (adr-1)/256);
-    }
-    return (lo | (hi << 8))+emu->y;
-}
 
 // ADC instruction
 
@@ -157,7 +125,7 @@ cycles_t i_and_abs(emustate* emu, abs_t opr) {
 cycles_t i_and_indr_y(emustate* emu, indr_t opr) {
     cycles_t xtra = 0;
     abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
-    g_and(emu, ADDR(emu, opr));
+    g_and(emu, ADDR(emu, adr));
     return 5 + xtra; //*
 }
 
