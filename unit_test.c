@@ -251,6 +251,50 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_N));
     assert(CHECK(emu.sr, FLAG_C));
     
+    // check branch instructions (BCC, BCS, BEQ, BMI, BNE, BPL, BVC, BVS)
+
+    //BCS, BCC
+    reset_proc(&emu);
+    i_sec(&emu);
+    emu.pc = 100;
+    i_bcs_rel(&emu, 5);
+    assert(emu.pc == 105);
+    i_bcc_rel(&emu, 5);
+    assert(emu.pc == 105);
+    i_clc(&emu);
+    i_bcc_rel(&emu, 0x5);
+    assert(emu.pc == 110);
+    
+    //BEQ, BNE
+    SET(emu.sr, FLAG_Z); //manually set Z flag
+    i_beq_rel(&emu, 5); //branch if Z set
+    assert(emu.pc == 115); 
+    i_bne_rel(&emu, 5); //should not branch (Z is currently set)
+    assert(emu.pc == 115);
+
+    // BPL, BMI
+    CLEAR(emu.sr, FLAG_N); //verify N is not set
+    i_bmi_rel(&emu, 5); //should not branch
+    assert(emu.pc == 115); 
+    i_bpl_rel(&emu, 5); //should branch
+    assert(emu.pc == 120);
+    SET(emu.sr, FLAG_N); //set N
+    i_bmi_rel(&emu, 5); //should branch
+    assert(emu.pc == 125);
+    i_bpl_rel(&emu, 5); //should not branch
+    assert(emu.pc == 125);
+
+    //BVC, BVS
+    CLEAR(emu.sr, FLAG_V);
+    i_bvs_rel(&emu, 5); //should not branch
+    assert(emu.pc == 125);
+    i_bvc_rel(&emu, 5); //should branch
+    assert(emu.pc == 130);
+    SET(emu.sr, FLAG_V);
+    i_bvc_rel(&emu, 5); //should not branch
+    assert(emu.pc == 130);
+    i_bvs_rel(&emu, 5); //should branch
+    assert(emu.pc == 135);
 
     printf("All tests passed.\n");
     return 0;

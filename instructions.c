@@ -190,14 +190,51 @@ cycles_t i_asl_abs_x(emustate* emu, abs_t opr) {
 }
 
 // BCC instruction
+
+cycles_t i_bcc_rel(emustate* emu, rel_t opr) {
+    if (!CHECK(emu->sr, FLAG_C))
+        emu->pc+=opr;
+    return 2; //**
+}
+
 // BCS instruction
+
+cycles_t i_bcs_rel(emustate* emu, rel_t opr) {
+    if (CHECK(emu->sr, FLAG_C))
+        emu->pc+=opr;
+    return 2; //**
+}
+
 // BEQ instruction
+
+cycles_t i_beq_rel(emustate* emu, rel_t opr) {
+    if (CHECK(emu->sr, FLAG_Z))
+        emu->pc+=opr;
+    return 2; //**
+}
+
 // BIT instruction
 // BMI instruttion
+
+cycles_t i_bmi_rel(emustate* emu, rel_t opr) {
+    if (CHECK(emu->sr, FLAG_N))
+        emu->pc+=opr;
+    return 2; //**
+}
+
 // BNE instruction
+
+cycles_t i_bne_rel(emustate* emu, rel_t opr) {
+    if (!CHECK(emu->sr, FLAG_Z))
+        emu->pc+=opr;
+    return 2; //**
+}
+
 // BPL instruction
 
 cycles_t i_bpl_rel(emustate* emu, rel_t opr) {
+    if (!CHECK(emu->sr, FLAG_N))
+        emu->pc+=opr;
     return 2; //**
 }
 
@@ -212,6 +249,21 @@ cycles_t i_brk(emustate* emu) {
 }
 
 // BVC instruction
+
+cycles_t i_bvc_rel(emustate* emu, rel_t opr) {
+    if (!CHECK(emu->sr, FLAG_V))
+        emu->pc+=opr;
+    return 2; //**
+}
+
+// BVS
+
+cycles_t i_bvs_rel(emustate* emu, rel_t opr) {
+    if (CHECK(emu->sr, FLAG_V))
+        emu->pc+=opr;
+    return 2; //**
+}
+
 // CLC instruction
 
 cycles_t i_clc(emustate* emu) {
