@@ -233,8 +233,58 @@ cycles_t i_clv(emustate* emu) {
 // CPX instruction
 // CPY instruction
 // DEC instruction
+
+void g_decr(emustate* emu, uint8_t* reg) {
+    (*reg)--;
+
+    if (*reg == 0) {
+        SET(emu->sr, FLAG_Z);
+    } else {
+        CLEAR(emu->sr, FLAG_Z);
+    }
+
+    if (CHECK(*reg, 7)) {
+        SET(emu->sr, FLAG_N);
+    } else {
+        CLEAR(emu->sr, FLAG_N);
+    }
+}
+
+cycles_t i_dec_zpg(emustate* emu, zpg_t opr) {
+    g_decr(emu, &emu->memory[0][opr]);
+    return 5;
+}
+
+cycles_t i_dec_abs(emustate* emu, abs_t opr) {
+    g_decr(emu, &emu->memory[opr/256][opr%256]);
+    return 6;
+}
+
+cycles_t i_dec_zpg_x(emustate* emu, zpg_t opr) {
+    g_decr(emu, &emu->memory[0][opr+emu->x]);
+    return 6;
+}
+
+cycles_t i_dec_abs_x(emustate* emu, abs_t opr) {
+    uint16_t adr = opr+emu->x;
+    g_decr(emu, &emu->memory[adr/256][adr%256]);
+    return 7;
+}
+
 // DEX instruction
+
+cycles_t i_dex(emustate* emu) {
+    g_decr(emu, &emu->x);
+    return 2;
+}
+
 // DEY instruction
+
+cycles_t i_dey(emustate* emu) {
+    g_decr(emu, &emu->y);
+    return 2;
+}
+
 // EOR instruction
 // INC instruction
 
@@ -252,6 +302,27 @@ void g_incr(emustate* emu, uint8_t* reg) {
     } else {
         CLEAR(emu->sr, FLAG_N);
     }
+}
+
+cycles_t i_inc_zpg(emustate* emu, zpg_t opr) {
+    g_incr(emu, &emu->memory[0][opr]);
+    return 5;
+}
+
+cycles_t i_inc_abs(emustate* emu, abs_t opr) {
+    g_incr(emu, &emu->memory[opr/256][opr%256]);
+    return 6;
+}
+
+cycles_t i_inc_zpg_x(emustate* emu, zpg_t opr) {
+    g_incr(emu, &emu->memory[0][opr+emu->x]);
+    return 6;
+}
+
+cycles_t i_inc_abs_x(emustate* emu, abs_t opr) {
+    int adr = opr+emu->x;
+    g_incr(emu, &emu->memory[adr/256][adr%256]);
+    return 7;
 }
 
 // INX instruction

@@ -194,6 +194,30 @@ int main() {
     assert(CHECK(emu.sr, FLAG_Z));
     assert(!CHECK(emu.sr, FLAG_N));
 
+    // test INC, INX, INY
+    reset_proc(&emu);
+
+    i_lda_imd(&emu, 0x35);
+    i_sta_abs(&emu, 0x8752);
+    assert(emu.memory[0x87][0x52] == 0x35);
+    i_inc_abs(&emu, 0x8752);
+    assert(emu.memory[0x87][0x52] == 0x36);
+    i_dec_abs(&emu, 0x8752);
+    assert(emu.memory[0x87][0x52] == 0x35);
+
+    i_ldx_imd(&emu, 0x20);
+    assert(emu.x == 0x20);
+    i_inx(&emu);
+    assert(emu.x == 0x21);
+    i_dex(&emu);
+    assert(emu.x == 0x20);
+
+    i_ldy_imd(&emu, 0x20);
+    assert(emu.y == 0x20);
+    i_iny(&emu);
+    assert(emu.y == 0x21);
+    i_dey(&emu);
+    assert(emu.y == 0x20);
 
     printf("All tests passed.\n");
     return 0;

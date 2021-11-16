@@ -1368,7 +1368,7 @@ DEC - decrement
 OPC: $D6
 OPR: zero-page, X-indexed
 */
-cycles_t i_dec_zpg_x(emustate* emu);
+cycles_t i_dec_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 RESERVED
@@ -1614,7 +1614,7 @@ INC - increment
 OPC: $FE
 OPR: absolute, X-indexed
 */
-cycles_t i_inc_abs_x(abs_t opr);
+cycles_t i_inc_abs_x(emustate* emu, abs_t opr);
 
 /*
 RESERVED
