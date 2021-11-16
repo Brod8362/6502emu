@@ -39,7 +39,6 @@ void g_adc(emustate* emu, uint8_t opr) {
     } else {
         CLEAR(emu->sr, FLAG_V);
     }
-    //TODO verify this is how overflow flag works
 
     emu->a = s & 0xFF;
 }
@@ -636,7 +635,7 @@ cycles_t i_php(emustate* emu) {
 // SBC instruction
 
 void g_sbc(emustate* emu, uint8_t opr) {
-    int16_t res = emu->a - opr - CHECK(emu->sr, FLAG_C); //TODO check this is correct
+    int16_t res = emu->a + ~opr + CHECK(emu->sr, FLAG_C); //TODO check this is correct
     if (res >= 0) {
         SET(emu->sr, FLAG_C);
     } else {
@@ -654,6 +653,53 @@ void g_sbc(emustate* emu, uint8_t opr) {
     } else {
         CLEAR(emu->sr, FLAG_N);
     }
+
+    if (res == 0) {
+        SET(emu->sr, FLAG_Z);
+    }  else {
+        CLEAR(emu->sr, FLAG_Z);
+    }
+
+    emu->a = res & 0xFF;
+}
+
+cycles_t i_sbc_indr_x(emustate* emu, indr_t opr) {
+    return 6;
+}
+
+cycles_t i_sbc_zpg(emustate* emu, zpg_t opr) {
+    g_sbc(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_sbc_imd(emustate* emu, imd_t opr) {
+    g_sbc(emu, opr);
+    return 2;
+}
+
+cycles_t i_sbc_abs(emustate* emu, abs_t opr) {
+    g_sbc(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
+cycles_t i_sbc_indr_y(emustate* emu, indr_t opr) {
+    return 5; //*
+}
+
+cycles_t i_sbc_zpg_x(emustate* emu, zpg_t opr) {
+    g_sbc(emu, emu->memory[0][opr+emu->x]);
+    return 4;
+}
+
+cycles_t i_sbc_abs_y(emustate* emu, abs_t opr) {
+    g_sbc(emu, emu->memory[0][opr+emu->y]);
+    return 4; //*
+}
+
+cycles_t i_sbc_abs_x(emustate* emu, abs_t opr) {
+    int adr = opr+emu->x;
+    g_sbc(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
 }
 
 // SEC instruction

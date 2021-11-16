@@ -296,6 +296,33 @@ int main() {
     i_bvs_rel(&emu, 5); //should branch
     assert(emu.pc == 135);
 
+    //SBC
+    reset_proc(&emu);
+    i_lda_imd(&emu, 5);
+    i_sec(&emu);
+    i_sbc_imd(&emu, 3);
+    assert(emu.a == 2);
+    assert(CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_Z));
+
+    i_lda_imd(&emu, 5);
+    i_sec(&emu);
+    i_sbc_imd(&emu, 6);
+    assert((int8_t)emu.a == -1);
+    assert(!CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 1);
+    i_sec(&emu);
+    i_sbc_imd(&emu, 20);
+    assert((int8_t)emu.a == -19);
+    assert(!CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
+
+
     printf("All tests passed.\n");
     return 0;
 }
