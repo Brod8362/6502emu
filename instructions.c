@@ -725,7 +725,7 @@ cycles_t i_stx_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_stx_zpg_y(emustate* emu, zpg_t opr) {
-    //TODO idk lol
+    emu->memory[0][opr+emu->y] = emu->x;
     return 4;
 }
 
@@ -742,7 +742,7 @@ cycles_t i_sty_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_sty_zpg_x(emustate* emu, zpg_t opr) {
-    //TODO idk lol
+    emu->memory[0][opr+emu->x] = emu->y;
     return 4;
 }
 
