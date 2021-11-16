@@ -1,4 +1,8 @@
 #include "instructions.h"
+#include <stdlib.h> //for NULL
+
+#define ADDR(e,x) e->memory[x/256][x%256]
+#define ZPG(e,x) e->memory[0][x]
 
 /*
 
@@ -10,6 +14,30 @@
     add 2 to cycles if branch occurs to different page
 
 */
+
+abs_t u_fetch_indr_x(emustate* emu, indr_t opr) {
+    abs_t adr = opr+emu->x;
+    uint8_t lo = emu->memory[adr/256][adr%256];
+    adr++;
+    uint8_t hi = emu->memory[adr/256][adr%256];
+    return (lo | (hi << 8));
+}
+
+/*
+emustate* emu: the emulator/processor state
+indr_t opr: address to index to find new address
+cycles_t* cycle_count: pointer to cycles_t which will include the extra # of cycles if a page boundary is crossed. (May be NULL)
+*/
+cycles_t u_fetch_indr_y(emustate* emu, indr_t opr, cycles_t* cycle_count) {
+    abs_t adr = opr;
+    uint8_t lo = ADDR(emu, adr);
+    adr++;
+    uint8_t hi = ADDR(emu, adr);
+    if (cycle_count != NULL) {
+        *cycle_count = ((adr/256) - (adr-1)/256);
+    }
+    return (lo | (hi << 8))+emu->y;
+}
 
 // ADC instruction
 
@@ -44,12 +72,13 @@ void g_adc(emustate* emu, uint8_t opr) {
 }
 
 cycles_t i_adc_indr_x(emustate* emu, indr_t opr) {
-    //TODO
+    int adr = u_fetch_indr_x(emu, opr);
+    g_adc(emu, ADDR(emu, adr));
     return 6;
 }
 
 cycles_t i_adc_zpg(emustate* emu, zpg_t opr) {
-    g_adc(emu, emu->memory[0][opr]);
+    g_adc(emu, ZPG(emu, opr));
     return 3;
 }
 
@@ -59,28 +88,29 @@ cycles_t i_adc_imd(emustate* emu, imd_t opr) {
 }
 
 cycles_t i_adc_abs(emustate* emu, abs_t opr) {
-    g_adc(emu, emu->memory[opr/256][opr%256]);
+    g_adc(emu, ADDR(emu, opr));
     return 4;
 }
 
 cycles_t i_adc_indr_y(emustate* emu, abs_t opr) {
-    //TODO
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    g_adc(emu, ADDR(emu, adr));
+    return 5 + xtra; //*
 }
 
 cycles_t i_adc_zpg_x(emustate* emu, zpg_t opr) {
-    g_adc(emu, emu->memory[0][opr+emu->x]);
+    g_adc(emu, ZPG(emu, opr+emu->x));
     return 4;
 }
 
 cycles_t i_adc_abs_y(emustate* emu, abs_t opr) {
-    //TODO 
+    g_adc(emu, ADDR(emu, emu->y+opr));
     return 4; //*
 }
 
 cycles_t i_adc_abs_x(emustate* emu, abs_t opr) {
-    int adr = emu->x+opr;
-    g_adc(emu, emu->memory[adr/256][adr%256]);
+    g_adc(emu, ADDR(emu, emu->x+opr));
     return 4; //*
 }
 
@@ -603,6 +633,7 @@ cycles_t i_jmp_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_jmp_indr(emustate* emu, indr_t opr) {
+    emu->pc = emu->memory[opr/256][opr%256];
     return 5;
 }
 
@@ -618,7 +649,8 @@ cycles_t i_jsr_abs(emustate* emu, abs_t opr) {
 // LDA instruction
 
 cycles_t i_lda_indr_x(emustate* emu, indr_t opr) {
-    //idk what's going on here
+    abs_t adr = u_fetch_indr_x(emu, opr);
+    emu->a = emu->memory[adr/256][adr%256];
     return 6;
 }
 
@@ -633,17 +665,20 @@ cycles_t i_lda_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_lda_indr_y(emustate* emu, indr_t opr) {
-    emu->a = emu->memory[opr/256][opr%256]+emu->y;
-    //todo verify this?
-    return 5; //*
+    cycles_t xtra = 0;
+    abs_t adr = u_fetch_indr_y(emu, opr, &xtra);
+    emu->a = emu->memory[adr/256][adr%256];
+    return 5 + xtra; //*
 }
 
 cycles_t i_lda_abs_y(emustate* emu, abs_t opr) {
+    abs_t adr = opr+emu->y;
+    emu->a = emu->memory[adr/256][adr%256];
     return 4; //*
 }
 
 cycles_t i_lda_abs_x(emustate* emu, abs_t opr) {
-    uint8_t adr = opr+emu->x;
+    abs_t adr = opr+emu->x;
     emu->a = emu->memory[adr/256][adr%256];
     return 4; //*
 }
