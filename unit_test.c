@@ -370,6 +370,22 @@ int main() {
     assert(CHECK(emu.sr, FLAG_Z));
     assert(!CHECK(emu.sr, FLAG_N));
 
+    //test BIT
+    reset_proc(&emu);
+    i_ldx_imd(&emu, 0b11001100);
+    i_stx_zpg(&emu, 0x10);
+    i_lda_imd(&emu, 0b00001000);
+    i_bit_zpg(&emu, 0x10);
+    assert(CHECK(emu.sr, 7));
+    assert(CHECK(emu.sr, 6));
+    assert(!CHECK(emu.sr, FLAG_Z));
+
+    i_lda_imd(&emu, 0b00010000);
+    i_bit_zpg(&emu, 0x10);
+    assert(CHECK(emu.sr, 7));
+    assert(CHECK(emu.sr, 6));
+    assert(CHECK(emu.sr, FLAG_Z));
+
     printf("All tests passed.\n");
     return 0;
 }

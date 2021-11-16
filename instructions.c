@@ -213,6 +213,37 @@ cycles_t i_beq_rel(emustate* emu, rel_t opr) {
 }
 
 // BIT instruction
+
+cycles_t g_bit(emustate* emu, uint8_t opr) {
+    if (CHECK(opr, 7)) {
+        SET(emu->sr, 7);
+    } else {
+        CLEAR(emu->sr, 7);
+    }
+
+    if (CHECK(opr, 6)) {
+        SET(emu->sr, 6);
+    } else {
+        CLEAR(emu->sr, 6);
+    }
+
+    if (!(opr & emu->a)) {
+        SET(emu->sr, FLAG_Z);
+    } else {
+        CLEAR(emu->sr, FLAG_Z);
+    }
+}
+
+cycles_t i_bit_zpg(emustate* emu, zpg_t opr) {
+    g_bit(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_bit_abs(emustate* emu, abs_t opr) {
+    g_bit(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
 // BMI instruttion
 
 cycles_t i_bmi_rel(emustate* emu, rel_t opr) {
