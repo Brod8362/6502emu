@@ -194,7 +194,7 @@ int main() {
     assert(CHECK(emu.sr, FLAG_Z));
     assert(!CHECK(emu.sr, FLAG_N));
 
-    // test INC, INX, INY
+    // test INC, INX, INY, DEC, DEX, DEY
     reset_proc(&emu);
 
     i_lda_imd(&emu, 0x35);
@@ -218,6 +218,9 @@ int main() {
     assert(emu.y == 0x21);
     i_dey(&emu);
     assert(emu.y == 0x20);
+
+    // test NOP
+    i_nop(&emu);
 
     printf("All tests passed.\n");
     return 0;

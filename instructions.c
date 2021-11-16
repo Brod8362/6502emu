@@ -431,6 +431,11 @@ cycles_t i_ldy_abs_x(emustate* emu, abs_t opr) {
 
 // LSR instruction
 // NOP instruction
+
+cycles_t i_nop(emustate* emu) {
+    return 2;
+}
+
 // ORA instruction
 
 /*
