@@ -333,6 +333,27 @@ int main() {
     i_pla(&emu);
     assert(emu.a == 40);
 
+    //test ROL and ROR
+    reset_proc(&emu);
+    i_lda_imd(&emu, 20);
+    i_rol_a(&emu);
+    assert(emu.a == 20 << 1);
+    i_sec(&emu); //set carry
+    i_lda_imd(&emu, 0b10001101);
+    i_rol_a(&emu);
+    assert(emu.a == 0b00011011);
+    assert(CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 0b00001111);
+    i_sec(&emu);
+    i_ror_a(&emu);
+    assert(emu.a == 0b10000111);
+    assert(CHECK(emu.sr, FLAG_C));
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
     printf("All tests passed.\n");
     return 0;
 }

@@ -648,7 +648,103 @@ cycles_t i_plp(emustate* emu) {
 }
 
 // ROL instruction
+
+void g_rol(emustate* emu, uint8_t* opr) {
+    uint8_t init_carry = CHECK(*opr, 7); //save 7th bit for later
+    *opr <<= 1; //shift left
+    *opr |= CHECK(emu->sr, FLAG_C); //add carry in
+    if (init_carry) //set carry to 7th bit 
+        SET(emu->sr, FLAG_C);
+    else
+        CLEAR(emu->sr, FLAG_C);
+
+    if (CHECK(emu->sr, 7)) //initial 6th bit
+        SET(emu->sr, FLAG_N);
+    else
+        CLEAR(emu->sr, FLAG_N);
+
+    if (*opr == 0)
+        SET(emu->sr, FLAG_Z);
+    else
+        CLEAR(emu->sr, FLAG_Z);
+    
+}
+
+cycles_t i_rol_zpg(emustate* emu, zpg_t opr) {
+    g_rol(emu, &emu->memory[0][opr]);
+    return 5;
+}
+
+cycles_t i_rol_a(emustate* emu) {
+    g_rol(emu, &emu->a);
+    return 2;
+}
+
+cycles_t i_rol_abs(emustate* emu, abs_t opr) {
+    g_rol(emu, &emu->memory[opr/256][opr%256]);
+    return 6;
+}
+
+cycles_t i_rol_zpg_x(emustate* emu, zpg_t opr) {
+    g_rol(emu, &emu->memory[0][opr+emu->a]);
+    return 6;
+}
+
+cycles_t i_rol_abs_x(emustate* emu, abs_t opr) {
+    uint16_t adr = opr+emu->x;
+    g_rol(emu, &emu->memory[adr/256][adr%256]);
+    return 7;
+}
+
 // ROR instruction
+
+void g_ror(emustate* emu, uint8_t* opr) {
+    uint8_t bit_0 = *opr & 1;
+    *opr >>= 1; //shift right
+    *opr |= (CHECK(emu->sr, FLAG_C) << 7); //add carry in
+
+    if (CHECK(emu->sr, FLAG_C)) //initial 6th bit
+        SET(emu->sr, FLAG_N);
+    else
+        CLEAR(emu->sr, FLAG_N);
+
+    if (bit_0)
+        SET(emu->sr, FLAG_C);
+    else
+        CLEAR(emu->sr, FLAG_C);
+
+    if (*opr == 0)
+        SET(emu->sr, FLAG_Z);
+    else
+        CLEAR(emu->sr, FLAG_Z);
+}
+
+cycles_t i_ror_zpg(emustate* emu, zpg_t opr) {
+    g_ror(emu, &emu->memory[0][opr]);
+    return 5;
+}
+
+cycles_t i_ror_a(emustate* emu) {
+    g_ror(emu, &emu->a);
+    return 2;
+}
+
+cycles_t i_ror_abs(emustate* emu, abs_t opr) {
+    g_ror(emu, &emu->memory[opr/256][opr%256]);
+    return 6;
+}
+
+cycles_t i_ror_zpg_x(emustate* emu, zpg_t opr) {
+    g_ror(emu, &emu->memory[0][opr+emu->a]);
+    return 6;
+}
+
+cycles_t i_ror_abs_x(emustate* emu, abs_t opr) {
+    uint16_t adr = opr+emu->x;
+    g_ror(emu, &emu->memory[adr/256][adr%256]);
+    return 7;
+}
+
 // RTI instruction
 // RTS instruction
 // SBC instruction
