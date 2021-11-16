@@ -286,6 +286,65 @@ cycles_t i_dey(emustate* emu) {
 }
 
 // EOR instruction
+
+void g_eor(emustate* emu, uint8_t opr) {
+    emu->a ^= opr;
+
+    if (emu->a == 0) {
+        SET(emu->sr, FLAG_Z);
+    } else {
+        CLEAR(emu->sr, FLAG_Z);
+    }
+
+    if (CHECK(emu->a, 7)) {
+        SET(emu->sr, FLAG_N);
+    } else {
+        CLEAR(emu->sr, FLAG_N);
+    }
+}
+
+cycles_t i_eor_indr_x(emustate* emu, indr_t opr) {
+    //TODO
+    return 6;
+}
+
+cycles_t i_eor_zpg(emustate* emu, zpg_t opr) {
+    g_eor(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_eor_imd(emustate* emu, imd_t opr) {
+    g_eor(emu, opr);
+    return 2;
+}
+
+cycles_t i_eor_abs(emustate* emu, abs_t opr) {
+    g_eor(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
+cycles_t i_eor_indr_y(emustate* emu, indr_t opr) {
+    //TODO
+    return 5; //*
+}
+
+cycles_t i_eor_zpg_x(emustate* emu, zpg_t opr) {
+    g_eor(emu, emu->memory[0][opr+emu->x]);
+    return 4;
+}
+
+cycles_t i_eor_abs_y(emustate* emu, abs_t opr) {
+    uint16_t adr = opr + emu->y;
+    g_eor(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
+}
+
+cycles_t i_eor_abs_x(emustate* emu, abs_t opr) {
+    uint16_t adr = opr + emu->x;
+    g_eor(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*  
+}
+
 // INC instruction
 
 void g_incr(emustate* emu, uint8_t* reg) {

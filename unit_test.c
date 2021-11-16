@@ -222,6 +222,19 @@ int main() {
     // test NOP
     i_nop(&emu);
 
+    //test EOR (XOR)
+    i_lda_imd(&emu, 0b11001100);
+    i_eor_imd(&emu, 0b00110011);
+    assert(emu.a == 0b11111111);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+
+    i_lda_imd(&emu, 0b11111111);
+    i_eor_imd(&emu, 0b11111111);
+    assert(emu.a == 0b00000000);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+
     printf("All tests passed.\n");
     return 0;
 }
