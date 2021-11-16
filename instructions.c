@@ -214,7 +214,7 @@ cycles_t i_beq_rel(emustate* emu, rel_t opr) {
 
 // BIT instruction
 
-cycles_t g_bit(emustate* emu, uint8_t opr) {
+void g_bit(emustate* emu, uint8_t opr) {
     if (CHECK(opr, 7)) {
         SET(emu->sr, 7);
     } else {
@@ -323,6 +323,66 @@ cycles_t i_clv(emustate* emu) {
 }
 
 // CMP instruction
+
+void g_cmp(emustate* emu, uint8_t opr) {
+    uint8_t res = emu->a - opr;
+    if (!res)
+        SET(emu->sr, FLAG_Z);
+    else
+        CLEAR(emu->sr, FLAG_Z);
+    
+    if (CHECK(res, 7))
+        SET(emu->sr, FLAG_N);
+    else 
+        CLEAR(emu->sr, FLAG_N); 
+
+    if (opr <= emu->a)
+        SET(emu->sr, FLAG_C);
+    else
+        CLEAR(emu->sr, FLAG_C);
+}
+
+cycles_t i_cmp_zpg_x(emustate* emu, zpg_t opr) {
+    g_cmp(emu, emu->memory[0][opr+emu->x]);
+    return 4;
+}
+
+cycles_t i_cmp_indr_x(emustate* emu, indr_t opr) {
+    return 6;
+}
+
+cycles_t i_cmp_zpg(emustate* emu, zpg_t opr) {
+    g_cmp(emu, emu->memory[0][opr]);
+    return 3;
+}
+
+cycles_t i_cmp_imd(emustate* emu, imd_t opr) {
+    g_cmp(emu, opr);
+    return 2;
+}
+
+cycles_t i_cmp_abs(emustate* emu, abs_t opr) {
+    g_cmp(emu, emu->memory[opr/256][opr%256]);
+    return 4;
+}
+
+cycles_t i_cmp_indr_y(emustate* emu, indr_t opr) {
+    return 5; //*
+}
+
+cycles_t i_cmp_abs_y(emustate* emu, abs_t opr) {
+    uint16_t adr = opr+emu->y;
+    g_cmp(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
+}
+
+cycles_t i_cmp_abs_x(emustate* emu, abs_t opr) {
+    uint16_t adr = opr+emu->x;
+    g_cmp(emu, emu->memory[adr/256][adr%256]);
+    return 4; //*
+    return 4; //*
+}
+
 // CPX instruction
 // CPY instruction
 // DEC instruction
@@ -533,6 +593,11 @@ cycles_t i_lda_abs_x(emustate* emu, abs_t opr) {
     uint8_t adr = opr+emu->x;
     emu->a = emu->memory[adr/256][adr%256];
     return 4; //*
+}
+
+cycles_t i_lda_zpg_x(emustate* emu, zpg_t opr) {
+    emu->a = emu->memory[0][opr+emu->x];
+    return 4;
 }
 
 // LDX instruction

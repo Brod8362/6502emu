@@ -392,6 +392,25 @@ int main() {
     i_jmp_abs(&emu, 0x40C7);
     assert(emu.pc == 0x40C7);
 
+    //test CMP
+    reset_proc(&emu);
+    i_lda_imd(&emu, 0x20);
+    i_cmp_imd(&emu, 0x20);
+    assert(CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
+
+    i_cmp_imd(&emu, 0x21);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(CHECK(emu.sr, FLAG_N));
+    assert(!CHECK(emu.sr, FLAG_C));
+
+    i_cmp_imd(&emu, 0x19);
+    assert(!CHECK(emu.sr, FLAG_Z));
+    assert(!CHECK(emu.sr, FLAG_N));
+    assert(CHECK(emu.sr, FLAG_C));
+    
+
     printf("All tests passed.\n");
     return 0;
 }

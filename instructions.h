@@ -1357,11 +1357,11 @@ OPC: $D4
 */
 
 /*
-CMP - compare with accumulator
-OPC: $D5
+LDA - load accumulator
+OPC: $B5
 OPR: zero-page, X-indexed
 */
-cycles_t i_cmp_zpg_x(emustate* emu, zpg_t opr);
+cycles_t i_lda_zpg_x(emustate* emu, zpg_t opr);
 
 /*
 DEC - decrement
@@ -1387,7 +1387,7 @@ CMP - compare with accumulator
 OPC: $D9
 OPR: absolute, Y-indexed
 */
-cycles_t i_cmp_abs_y(emustate* emu);
+cycles_t i_cmp_abs_y(emustate* emu, abs_t opr);
 
 /*
 RESERVED
