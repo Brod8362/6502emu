@@ -1,2 +1,3 @@
 *.o
 unit_test
+.vscode
