@@ -443,6 +443,16 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_Z));
     assert(!CHECK(emu.sr, FLAG_N));
     assert(CHECK(emu.sr, FLAG_C));
+
+    //test RTS, JSR
+    reset_proc(&emu);
+    emu.pc=0x1234;
+    i_jsr_abs(&emu, 0xABCD);
+    assert(emu.pc == 0xABCD);
+    emu.pc+=5;
+    i_rts(&emu);
+    assert(emu.pc == 0x1234);
+
     
 
     printf("All tests passed.\n");

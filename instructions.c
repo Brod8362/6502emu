@@ -606,6 +606,15 @@ cycles_t i_jmp_indr(emustate* emu, indr_t opr) {
     return 5;
 }
 
+// JSR instruction
+
+cycles_t i_jsr_abs(emustate* emu, abs_t opr) {
+    emu->memory[1][emu->sp--] = emu->pc/256;
+    emu->memory[1][emu->sp--] = emu->pc%256;
+    emu->pc = opr;
+    return 6;
+}
+
 // LDA instruction
 
 cycles_t i_lda_indr_x(emustate* emu, indr_t opr) {
@@ -937,6 +946,14 @@ cycles_t i_ror_abs_x(emustate* emu, abs_t opr) {
 
 // RTI instruction
 // RTS instruction
+
+cycles_t i_rts(emustate* emu) {
+    uint8_t low = emu->memory[1][++emu->sp];
+    uint8_t high = emu->memory[1][++emu->sp];
+    emu->pc = low | (high << 8);
+    return 6;
+}
+
 // SBC instruction
 
 void g_sbc(emustate* emu, uint8_t opr) {
