@@ -492,6 +492,16 @@ cycles_t i_iny(emustate* emu) {
 }
 
 // JMP instruction
+
+cycles_t i_jmp_abs(emustate* emu, abs_t opr) {
+    emu->pc = opr;
+    return 3;
+}
+
+cycles_t i_jmp_indr(emustate* emu, indr_t opr) {
+    return 5;
+}
+
 // LDA instruction
 
 cycles_t i_lda_indr_x(emustate* emu, indr_t opr) {
@@ -634,10 +644,6 @@ cycles_t i_nop(emustate* emu) {
 
 // ORA instruction
 
-/*
-emu : emustate
-opr : value accumulator will be or'd with
-*/
 void g_ora(emustate* emu, uint8_t opr) {
     CLEAR(emu->sr, FLAG_Z);
     CLEAR(emu->sr, FLAG_N);

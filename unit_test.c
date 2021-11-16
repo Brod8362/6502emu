@@ -386,6 +386,12 @@ int main() {
     assert(CHECK(emu.sr, 6));
     assert(CHECK(emu.sr, FLAG_Z));
 
+    //test JMP
+    reset_proc(&emu);
+    emu.pc = 0x328A;
+    i_jmp_abs(&emu, 0x40C7);
+    assert(emu.pc == 0x40C7);
+
     printf("All tests passed.\n");
     return 0;
 }
