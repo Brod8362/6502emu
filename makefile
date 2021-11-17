@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -g3
 
-unit_test: instructions.o unit_test.o addr_idx.o
+unit_test: instructions.o unit_test.o addr_idx.o bcd.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
 

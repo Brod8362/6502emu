@@ -156,6 +156,17 @@ int main() {
     assert(CHECK(emu.sr, FLAG_C)); //C must be set
     assert(CHECK(emu.sr, FLAG_V));  //V must be set
 
+    // test ADC in decimal mode
+    reset_proc(&emu);
+    i_sed(&emu);
+    i_lda_imd(&emu, 0x10);
+    i_adc_imd(&emu, 0x01);
+    assert(emu.a == 0x11);
+    i_lda_imd(&emu, 0x59);
+    i_clc(&emu);
+    i_adc_imd(&emu, 0x01);
+    assert(emu.a == 0x60);
+
     //test AND instruction
     reset_proc(&emu);
     i_lda_imd(&emu, 0b11001111);

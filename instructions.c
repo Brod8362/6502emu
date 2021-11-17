@@ -1,5 +1,7 @@
-#include "instructions.h"
 #include "addr_idx.h"
+#include "bcd.h"
+#include "instructions.h"
+
 #include <stdlib.h> //for NULL
 
 /*
@@ -16,33 +18,45 @@
 // ADC instruction
 
 void g_adc(emustate* emu, uint8_t opr) {
-    uint16_t s = emu->a + opr + CHECK(emu->sr, FLAG_C);
+    if (!CHECK(emu->sr, FLAG_D)) { //normal mode
+        uint16_t s = emu->a + opr + CHECK(emu->sr, FLAG_C);
 
-    if (s > 255) {
-        SET(emu->sr, FLAG_C);
-    } else {
-        CLEAR(emu->sr, FLAG_C);
+        if (s > 255)
+            SET(emu->sr, FLAG_C);
+        else 
+            CLEAR(emu->sr, FLAG_C);
+
+        if (CHECK(s, 7) != CHECK(emu->a, 7))
+            SET(emu->sr, FLAG_V);
+        else
+            CLEAR(emu->sr, FLAG_V);
+
+        emu->a = s & 0xFF;
+    } else { //decimal mode
+        uint16_t r = bcd_to_dec(opr) + bcd_to_dec(emu->a) + CHECK(emu->sr, FLAG_C);
+        if (r > 99)
+            SET(emu->sr, FLAG_C);
+        else
+            CLEAR(emu->sr, FLAG_C);
+
+        /* the V flag in BCD mode is considered undefined behavior for the 6502. i've chosen to just not touch it,
+        /  though i may change this in the future if i feel the need to.
+        /   
+        /   additionally, what occurs when the BCD is invalid is also undefined behavior. so, what happens happens.
+        */
+    
+        emu->a = dec_to_bcd(r);
     }
 
-    if (CHECK(s, 7)) {
+    if (CHECK(emu->a, 7))
         SET(emu->sr, FLAG_N);
-    } else {
+    else
         CLEAR(emu->sr, FLAG_N);
-    }
 
-    if (s == 0) {
+    if (emu->a == 0)
         SET(emu->sr, FLAG_Z);
-    } else {
+    else
         CLEAR(emu->sr, FLAG_Z);
-    }  
-
-    if (CHECK(s, 7) != CHECK(emu->a, 7)) {
-        SET(emu->sr, FLAG_V);
-    } else {
-        CLEAR(emu->sr, FLAG_V);
-    }
-
-    emu->a = s & 0xFF;
 }
 
 cycles_t i_adc_indr_x(emustate* emu, indr_t opr) {
