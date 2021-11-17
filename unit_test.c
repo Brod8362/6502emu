@@ -332,6 +332,16 @@ int main() {
     assert(!CHECK(emu.sr, FLAG_Z));
     assert(CHECK(emu.sr, FLAG_N));
 
+    //SBC decimal mode
+    reset_proc(&emu);
+    i_sed(&emu);
+    i_lda_imd(&emu, 0x20);
+    i_sbc_imd(&emu, 0x05);
+    assert(emu.a == 0x15);
+    i_clc(&emu);
+    i_sbc_imd(&emu, 0x06);
+    assert(emu.a == 0x09);
+
     //test PLP, PLA, PHP, PHA
     reset_proc(&emu);
     i_lda_imd(&emu, 20);

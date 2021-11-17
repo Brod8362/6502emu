@@ -1011,32 +1011,35 @@ cycles_t i_rts(emustate* emu) {
 // SBC instruction
 
 void g_sbc(emustate* emu, uint8_t opr) {
-    int16_t res = emu->a + ~opr + CHECK(emu->sr, FLAG_C); //TODO check this is correct
-    if (res >= 0) {
-        SET(emu->sr, FLAG_C);
-    } else {
-        CLEAR(emu->sr, FLAG_C);
+    if (!CHECK(emu->sr, FLAG_D)) { //binary mode
+        int16_t res = emu->a + ~opr + CHECK(emu->sr, FLAG_C); //TODO check this is correct
+
+        if (res > 127 || res < -127)
+            SET(emu->sr, FLAG_V);
+        else
+            CLEAR(emu->sr, FLAG_V);
+
+        emu->a = res & 0xFF;
+    } else { //decimal mode
+        int16_t res = bcd_to_dec(emu->a) - bcd_to_dec(opr) + CHECK(emu->sr, FLAG_C);
+
+        emu->a = dec_to_bcd(res);
     }
 
-    if (res > 127 || res < -127) {
-        SET(emu->sr, FLAG_V);
-    } else {
-        CLEAR(emu->sr, FLAG_V);
-    }
-
-    if (CHECK(res, 7)) {
+    if (CHECK(emu->a, 7))
         SET(emu->sr, FLAG_N);
-    } else {
+    else
         CLEAR(emu->sr, FLAG_N);
-    }
 
-    if (res == 0) {
+    if ((int8_t)emu->a >= 0)
+        SET(emu->sr, FLAG_C);
+    else 
+        CLEAR(emu->sr, FLAG_C);
+
+    if (emu->a == 0)
         SET(emu->sr, FLAG_Z);
-    }  else {
+    else
         CLEAR(emu->sr, FLAG_Z);
-    }
-
-    emu->a = res & 0xFF;
 }
 
 cycles_t i_sbc_indr_x(emustate* emu, indr_t opr) {
