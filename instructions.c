@@ -200,7 +200,7 @@ cycles_t i_asl_abs_x(emustate* emu, abs_t opr) {
 cycles_t i_bcc_rel(emustate* emu, rel_t opr) {
     if (!CHECK(emu->sr, FLAG_C))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BCS instruction
@@ -208,7 +208,7 @@ cycles_t i_bcc_rel(emustate* emu, rel_t opr) {
 cycles_t i_bcs_rel(emustate* emu, rel_t opr) {
     if (CHECK(emu->sr, FLAG_C))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BEQ instruction
@@ -216,7 +216,7 @@ cycles_t i_bcs_rel(emustate* emu, rel_t opr) {
 cycles_t i_beq_rel(emustate* emu, rel_t opr) {
     if (CHECK(emu->sr, FLAG_Z))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BIT instruction
@@ -256,7 +256,7 @@ cycles_t i_bit_abs(emustate* emu, abs_t opr) {
 cycles_t i_bmi_rel(emustate* emu, rel_t opr) {
     if (CHECK(emu->sr, FLAG_N))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BNE instruction
@@ -264,7 +264,7 @@ cycles_t i_bmi_rel(emustate* emu, rel_t opr) {
 cycles_t i_bne_rel(emustate* emu, rel_t opr) {
     if (!CHECK(emu->sr, FLAG_Z))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BPL instruction
@@ -272,7 +272,7 @@ cycles_t i_bne_rel(emustate* emu, rel_t opr) {
 cycles_t i_bpl_rel(emustate* emu, rel_t opr) {
     if (!CHECK(emu->sr, FLAG_N))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BRK instruction
@@ -290,7 +290,7 @@ cycles_t i_brk(emustate* emu) {
 cycles_t i_bvc_rel(emustate* emu, rel_t opr) {
     if (!CHECK(emu->sr, FLAG_V))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // BVS
@@ -298,7 +298,7 @@ cycles_t i_bvc_rel(emustate* emu, rel_t opr) {
 cycles_t i_bvs_rel(emustate* emu, rel_t opr) {
     if (CHECK(emu->sr, FLAG_V))
         emu->pc+=opr;
-    return 2; //**
+    return 2 + BRANCH_CYCLES(emu, opr); //**
 }
 
 // CLC instruction
