@@ -2,7 +2,7 @@
 #define TYPES_H
 
 #include "stdint.h"
-
+#include "emustate.h"
 
 /*
 immediate value
@@ -35,5 +35,25 @@ typedef uint16_t indr_t;
 number of cycles it takes for an instruction of execute
 */
 typedef uint16_t cycles_t;
+
+enum instruction_type {
+    Absolute, Immediate, Implied, Indirect, Relative, Zeropage
+};
+
+union instruction_func {
+    cycles_t (*absolute) (emustate*, abs_t);
+    cycles_t (*immediate) (emustate*, imd_t);
+    cycles_t (*implied) (emustate*);
+    cycles_t (*indirect) (emustate*, indr_t);
+    cycles_t (*relative) (emustate*, rel_t);
+    cycles_t (*zpg) (emustate*, zpg_t);
+};
+
+typedef struct instr_info {
+    const char* name;
+    const uint8_t opcode;
+    const enum instruction_type type;
+    const union instruction_func fptr;
+} instr_info;
 
 #endif
