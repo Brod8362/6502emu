@@ -1,3 +1,4 @@
 *.o
 unit_test
 .vscode
+6502emu
