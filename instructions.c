@@ -674,6 +674,11 @@ cycles_t i_lda_indr_x(emustate* emu, indr_t opr) {
     return 6;
 }
 
+cycles_t i_lda_zpg(emustate* emu, zpg_t opr) {
+    emu->a = ZPG(emu, opr);
+    return 3;
+}
+
 cycles_t i_lda_imd(emustate* emu, imd_t opr) {
     emu->a = opr;
     return 2;
@@ -999,6 +1004,12 @@ cycles_t i_ror_abs_x(emustate* emu, abs_t opr) {
 }
 
 // RTI instruction
+
+cycles_t i_rti(emustate* emu) {
+    //todo actually write this
+    return 6;
+}
+
 // RTS instruction
 
 cycles_t i_rts(emustate* emu) {
