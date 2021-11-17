@@ -79,13 +79,15 @@ cycles_t i_adc_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_adc_abs_y(emustate* emu, abs_t opr) {
-    g_adc(emu, ADDR(emu, emu->y+opr));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_adc(emu, u_fetch_abs_reg(emu, emu->y, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 cycles_t i_adc_abs_x(emustate* emu, abs_t opr) {
-    g_adc(emu, ADDR(emu, emu->x+opr));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_adc(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 // AND instruction
@@ -135,13 +137,15 @@ cycles_t i_and_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_and_abs_y(emustate* emu, abs_t opr) {
-    g_and(emu, ADDR(emu, opr+emu->y));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_and(emu, u_fetch_abs_reg(emu, emu->y, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 cycles_t i_and_abs_x(emustate* emu, abs_t opr) {
-    g_and(emu, ADDR(emu, opr+emu->x));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_and(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 // ASL instruction
@@ -383,13 +387,15 @@ cycles_t i_cmp_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_cmp_abs_y(emustate* emu, abs_t opr) {
-    g_cmp(emu, ADDR(emu, opr+emu->y));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_cmp(emu, u_fetch_abs_reg(emu, emu->y, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 cycles_t i_cmp_abs_x(emustate* emu, abs_t opr) {
-    g_cmp(emu, ADDR(emu, opr+emu->x));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_cmp(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 // CPX instruction
@@ -538,13 +544,15 @@ cycles_t i_eor_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_eor_abs_y(emustate* emu, abs_t opr) {
-    g_eor(emu, ADDR(emu, opr+emu->y));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_eor(emu, u_fetch_abs_reg(emu, emu->y, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 cycles_t i_eor_abs_x(emustate* emu, abs_t opr) {
-    g_eor(emu, ADDR(emu, opr+emu->x));
-    return 4; //*  
+    cycles_t xtra = 0;
+    g_eor(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    return 4 + xtra; //*  
 }
 
 // INC instruction
@@ -646,13 +654,15 @@ cycles_t i_lda_indr_y(emustate* emu, indr_t opr) {
 }
 
 cycles_t i_lda_abs_y(emustate* emu, abs_t opr) {
-    emu->a = ADDR(emu, opr+emu->y);
-    return 4; //*
+    cycles_t xtra = 0;
+    emu->a = u_fetch_abs_reg(emu, emu->y, opr, &xtra);
+    return 4 + xtra; //*
 }
 
 cycles_t i_lda_abs_x(emustate* emu, abs_t opr) {
-    emu->a = ADDR(emu, opr+emu->x);
-    return 4; //*
+    cycles_t xtra = 0;
+    emu->a = u_fetch_abs_reg(emu, emu->x, opr, &xtra);
+    return 4 + xtra; //*
 }
 
 cycles_t i_lda_zpg_x(emustate* emu, zpg_t opr) {
@@ -683,8 +693,9 @@ cycles_t i_ldx_zpg_y(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_ldx_abs_y(emustate* emu, abs_t opr) {
-    emu-> x = ZPG(emu, opr+emu->y);
-    return 4; //*
+    cycles_t xtra = 0;
+    emu-> x = u_fetch_abs_reg(emu, emu->y, opr, &xtra);
+    return 4 + xtra; //*
 }
 
 // LDY instruction
@@ -710,8 +721,9 @@ cycles_t i_ldy_abs(emustate* emu, abs_t opr) {
 }
 
 cycles_t i_ldy_abs_x(emustate* emu, abs_t opr) {
-    emu->y = ADDR(emu, emu->x+opr);
-    return 4; //*
+    cycles_t xtra = 0;
+    emu->y = u_fetch_abs_reg(emu, emu->x, opr, &xtra);
+    return 4 + xtra; //*
 }
 
 // LSR instruction
@@ -813,13 +825,15 @@ cycles_t i_ora_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_ora_abs_y(emustate* emu, abs_t opr) {
-    g_ora(emu, ADDR(emu, opr+emu->y));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_ora(emu, u_fetch_abs_reg(emu, emu->y, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 cycles_t i_ora_abs_x(emustate* emu, abs_t opr) {
-    g_ora(emu, ADDR(emu, opr+emu->x));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_func(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 // PHA instruction
@@ -1021,13 +1035,15 @@ cycles_t i_sbc_zpg_x(emustate* emu, zpg_t opr) {
 }
 
 cycles_t i_sbc_abs_y(emustate* emu, abs_t opr) {
-    g_sbc(emu, ADDR(emu, opr+emu->y));
-    return 4; //*
-}
+    cycles_t xtra = 0;
+    g_sbc(emu, u_fetch_abs_reg(emu, emu->y, opr, &xtra));
+    return 4 + xtra; //*
+} 
 
 cycles_t i_sbc_abs_x(emustate* emu, abs_t opr) {
-    g_sbc(emu, ADDR(emu, opr+emu->x));
-    return 4; //*
+    cycles_t xtra = 0;
+    g_func(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    return 4 + xtra; //*
 }
 
 // SEC instruction
