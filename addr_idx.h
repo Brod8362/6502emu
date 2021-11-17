@@ -1,3 +1,6 @@
+#ifndef ADDR_IDX_H
+#define ADDR_IDX_H
+
 #include "types.h"
 #include "emustate.h"
 
@@ -28,3 +31,5 @@ cycles_t* cycle_count: pointer to cycles_t which will include the extra # of cyc
 return: the value stored at 16-bit address opr+reg
 */
 uint8_t u_fetch_abs_reg(emustate* emu, uint8_t reg, abs_t opr, cycles_t* cycle_count);
+
+#endif
