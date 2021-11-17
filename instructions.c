@@ -198,25 +198,34 @@ cycles_t i_asl_abs_x(emustate* emu, abs_t opr) {
 // BCC instruction
 
 cycles_t i_bcc_rel(emustate* emu, rel_t opr) {
-    if (!CHECK(emu->sr, FLAG_C))
+    cycles_t c = 0;
+    if (!CHECK(emu->sr, FLAG_C)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BCS instruction
 
 cycles_t i_bcs_rel(emustate* emu, rel_t opr) {
-    if (CHECK(emu->sr, FLAG_C))
+    cycles_t c = 0;
+    if (CHECK(emu->sr, FLAG_C)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BEQ instruction
 
 cycles_t i_beq_rel(emustate* emu, rel_t opr) {
-    if (CHECK(emu->sr, FLAG_Z))
+    cycles_t c = 0;
+    if (CHECK(emu->sr, FLAG_Z)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BIT instruction
@@ -254,25 +263,34 @@ cycles_t i_bit_abs(emustate* emu, abs_t opr) {
 // BMI instruttion
 
 cycles_t i_bmi_rel(emustate* emu, rel_t opr) {
-    if (CHECK(emu->sr, FLAG_N))
+    cycles_t c = 0;
+    if (CHECK(emu->sr, FLAG_N)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BNE instruction
 
 cycles_t i_bne_rel(emustate* emu, rel_t opr) {
-    if (!CHECK(emu->sr, FLAG_Z))
+    cycles_t c = 0;
+    if (!CHECK(emu->sr, FLAG_Z)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BPL instruction
 
 cycles_t i_bpl_rel(emustate* emu, rel_t opr) {
-    if (!CHECK(emu->sr, FLAG_N))
+    cycles_t c = 0;
+    if (!CHECK(emu->sr, FLAG_N)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BRK instruction
@@ -288,17 +306,23 @@ cycles_t i_brk(emustate* emu) {
 // BVC instruction
 
 cycles_t i_bvc_rel(emustate* emu, rel_t opr) {
-    if (!CHECK(emu->sr, FLAG_V))
+    cycles_t c = 0;
+    if (!CHECK(emu->sr, FLAG_V)) {
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // BVS
 
 cycles_t i_bvs_rel(emustate* emu, rel_t opr) {
-    if (CHECK(emu->sr, FLAG_V))
+    cycles_t c = 0;
+    if (CHECK(emu->sr, FLAG_V)) {        
+        c = BRANCH_CYCLES(emu, opr);
         emu->pc+=opr;
-    return 2 + BRANCH_CYCLES(emu, opr); //**
+    }
+    return 2 + c; //**
 }
 
 // CLC instruction

@@ -3,7 +3,7 @@
 
 #define ADDR(e,x) e->memory[(x)/256][(x)%256]
 #define ZPG(e,x) e->memory[0][(x)%256]
-#define BRANCH_CYCLES(e,offset) (e->pc/256 != (offset+e->pc)/256) ? 2 : 1
+#define BRANCH_CYCLES(e,offset) (e->pc/256 != (e->pc+offset)/256 ? 2 : 1)
 
 /*
 emustate* emu: the emulator/processor state

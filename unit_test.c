@@ -453,7 +453,17 @@ int main() {
     i_rts(&emu);
     assert(emu.pc == 0x1234);
 
-    
+    //test cycle counts for break instructions
+    cycles_t cycles;
+    reset_proc(&emu);
+    i_jmp_abs(&emu, 0x0);
+    cycles = i_bcc_rel(&emu, 1);
+    assert(emu.pc == 1);
+    assert(cycles == 3);
+    i_jmp_abs(&emu, 0xFE);
+    cycles = i_bcc_rel(&emu, 0x7F);
+    assert(emu.pc == 0xFE + 0x7F);
+    assert(cycles == 4);
 
     printf("All tests passed.\n");
     return 0;
