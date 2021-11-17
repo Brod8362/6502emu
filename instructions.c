@@ -832,7 +832,7 @@ cycles_t i_ora_abs_y(emustate* emu, abs_t opr) {
 
 cycles_t i_ora_abs_x(emustate* emu, abs_t opr) {
     cycles_t xtra = 0;
-    g_func(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    g_ora(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
     return 4 + xtra; //*
 }
 
@@ -1042,7 +1042,7 @@ cycles_t i_sbc_abs_y(emustate* emu, abs_t opr) {
 
 cycles_t i_sbc_abs_x(emustate* emu, abs_t opr) {
     cycles_t xtra = 0;
-    g_func(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
+    g_sbc(emu, u_fetch_abs_reg(emu, emu->x, opr, &xtra));
     return 4 + xtra; //*
 }
 
