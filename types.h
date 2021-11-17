@@ -37,7 +37,7 @@ number of cycles it takes for an instruction of execute
 typedef uint16_t cycles_t;
 
 enum instruction_type {
-    Absolute, Immediate, Implied, Indirect, Relative, Zeropage
+    Implied, Relative, Zeropage, Absolute, Immediate, Indirect
 };
 
 union instruction_func {
