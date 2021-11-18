@@ -58,6 +58,10 @@ int main(int argc, char** argv) {
             printf("Invalid opcode $%02x\n @ $%04x\n", opcode, emu.pc-1);
             return 1;
         }
+        if (opcode != i->opcode) {
+            printf("Opcode in memory ($%02x) at address $%04x and opcode in lookup table (%s, $%02x) do not match\n", opcode, emu.pc-1, i->name, i->opcode);
+            return 1;
+        }
         printf("Decoded instruction %s ($%02x) @ $%04x\n", i->name, opcode, emu.pc-1);
         cycles_t cycles;
         switch (i->type) {
@@ -74,14 +78,13 @@ int main(int argc, char** argv) {
                 cycles = i->fptr.absolute(&emu, read_16(&emu));
                 break;
             case Immediate:
-                cycles = i->fptr.immediate(&emu, read_16(&emu));
+                cycles = i->fptr.immediate(&emu, read_8(&emu));
                 break;
             case Indirect:
                 cycles = i->fptr.indirect(&emu, read_16(&emu));
                 break;
             default:
-                cycles = 0;
-                printf("Failed to determine instruction type");
+                printf("Failed to determine instruction type\n");
                 return 2;
         }
         
