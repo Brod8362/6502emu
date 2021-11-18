@@ -3,3 +3,4 @@ unit_test
 .vscode
 6502emu
 *.6
+*.o65
