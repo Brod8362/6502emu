@@ -186,9 +186,9 @@ const instr_info* instr_map[256] = {
     NULL, //$1C
     &s_ora_abs_x, //$1D
     &s_asl_abs_x, //$1E
-    &s_jsr_abs, //$1F
-    &s_and_indr_x, //$20
-    NULL, //$21
+    NULL, //$1F
+    &s_jsr_abs, //$20
+    &s_and_indr_x, //$21
     NULL, //$22
     NULL, //$23
     &s_bit_zpg, //$24
